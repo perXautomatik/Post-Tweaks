@@ -17,7 +17,6 @@ Please, do not use Post Tweaks if you do not know what it does. The author takes
 ## Prerequisites
 - Windows 10
 - Stable internet connection
-- Nsudo to launch the script with full administrative privileges
 
 ## Download
 Get the latest version [here](https://github.com/ArtanisInc/Post-Tweaks/releases/download/v1.0/PostTweaks.zip)
