@@ -20,6 +20,9 @@ if %ERRORLEVEL% neq 0 (
     exit
 )
 
+whoami /user | find /i "S-1-5-18" >nul 2>&1
+if %ERRORLEVEL% neq 0 call "modules\nsudo.exe" -U:T -P:E -UseCurrentConsole "%~dpnx0" && exit
+
 ping -n 1 "google.com" >nul 2>&1
 if %ERRORLEVEL% neq 0 (
     echo [40;31mERROR: [40;90mNo internet connection found
@@ -29,25 +32,25 @@ if %ERRORLEVEL% neq 0 (
     exit
 )
 
-set "NEEDEDFILES=modules/7z.exe modules/7z.dll modules/choicebox.exe modules/smartctl.exe resources/ProcessExplorer.exe resources/ExtremePerformance.pow resources/SetTimerResolutionService.exe resources/NvidiaProfileInspector.exe resources/Performance.nip"
+set "NEEDEDFILES=modules/7z.exe modules/7z.dll modules/choicebox.exe modules/smartctl.exe modules/nsudo.exe modules/devicecleanup.exe resources/procexp.exe resources/ExtremePerformance.pow resources/SetTimerResolutionService.exe resources/StartIsBack.exe resources/SDL.dll resources/NvidiaProfileInspector.exe resources/Performance.nip resources/Reference.xml"
 for %%i in (!NEEDEDFILES!) do (
     if not exist %%i (
-        set "MISSINGFILES=true"
+        set "MISSINGFILES=True"
         echo [40;31mERROR: [40;33m%%i [40;90mis missing
         echo.
     )
 )
-if "!MISSINGFILES!"=="true" echo Downloading missing files please wait...[40;33m
+if "!MISSINGFILES!"=="True" echo Downloading missing files please wait...[40;33m
 for %%i in (!NEEDEDFILES!) do (
     if not exist %%i (
-        call :CURL -L --progress-bar "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/master/%%i" --create-dirs -o "%%i"
+        call :CURL -L --progress-bar "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/main/%%i" --create-dirs -o "%%i"
     )
 )
 
 set NVERSION=0
 set NVERSION_INFO=0
 
-call :CURL --silent "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/master/version.txt" --create-dirs -o "version.txt"
+call :CURL --silent "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/main/version.txt" --create-dirs -o "version.txt"
 if %ERRORLEVEL% equ 0 (
     for /f "tokens=1 delims= " %%i in (version.txt) do set NVERSION=%%i
     for /f "tokens=1,2 delims= " %%i in (version.txt) do set NVERSION_INFO=%%j
@@ -67,16 +70,16 @@ if /i !VERSION! lss !NVERSION! (
         echo.
         echo Updating to the latest version, please wait...[40;33m
         echo.
-        call :CURL -L --progress-bar "https://github.com/ArtanisInc/Post-Tweaks/archive/master.zip" --create-dirs -o "master.zip"
-        call "modules\7z.exe" x -aoa "master.zip" >nul 2>&1
-        del /f /q master.zip >nul 2>&1
-        rd /s /q modules >nul 2>&1
-        rd /s /q resources >nul 2>&1
-        move Post-Tweaks-master\modules modules >nul 2>&1
-        move Post-Tweaks-master\resources resources >nul 2>&1
-        move Post-Tweaks-master\PostTweaks.bat PostTweaks.bat >nul 2>&1
-        rd /s /q Post-Tweaks-master >nul 2>&1
-        del /f /q version.txt >nul 2>&1
+        call :CURL -L --progress-bar "https://github.com/ArtanisInc/Post-Tweaks/archive/main.zip" --create-dirs -o "main.zip"
+        call "modules\7z.exe" x -aoa "main.zip" >nul 2>&1
+        del /f /q "main.zip" >nul 2>&1
+        rd /s /q "modules" >nul 2>&1
+        rd /s /q "resources" >nul 2>&1
+        move "Post-Tweaks-main\modules" "modules" >nul 2>&1
+        move "Post-Tweaks-main\resources" "resources" >nul 2>&1
+        move "Post-Tweaks-main\PostTweaks.bat" "PostTweaks.bat" >nul 2>&1
+        rd /s /q "Post-Tweaks-main" >nul 2>&1
+        del /f /q "version.txt" >nul 2>&1
         if exist "PostTweaks.bat" start "runas /user:administrator" cmd /k  "PostTweaks.bat"
         exit
     )
@@ -123,16 +126,12 @@ goto MAIN_MENU
 
 
 :SYSTWEAKS
-call :SETVARIABLE
+call :SETVARIABLES
 
 call :MSGBOX "Do you want to create a registry backup and a restore point ?" vbYesNo+vbQuestion "System Restore"
 if %ERRORLEVEL% equ 6 (
     wmic /namespace:\\root\default path systemrestore call createrestorepoint "Post Tweaks", 100, 12
     regedit /e "%USERPROFILE%\desktop\Registry Backup.reg"
-)
-
-if "!SSD!"=="yes" (
-    fsutil behavior set disabledeletenotify 0
 )
 
 :: Disable User Account Control
@@ -147,28 +146,313 @@ reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "Ena
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "ConsentPromptBehaviorUser" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Policies\System" /v "FilterAdministratorToken" /t REG_DWORD /d "0" /f >nul 2>&1
 
+:: BCDEDIT
+bcdedit /set disabledynamictick Yes
+bcdedit /set useplatformclock No
+bcdedit /set useplatformtick Yes
+bcdedit /set tscsyncpolicy Enhanced
+bcdedit /set nx AlwaysOff
+bcdedit /set pae ForceDisable
+bcdedit /set ems No
+bcdedit /set bootems No
+bcdedit /set integrityservices disable
+bcdedit /set tpmbootentropy ForceDisable
+bcdedit /set debug No
+bcdedit /set hypervisorlaunchtype Off
+bcdedit /set disableelamdrivers Yes
+bcdedit /set firstmegabytepolicy UseAll
+bcdedit /set avoidlowmemory 0x8000000
+bcdedit /set allowedinmemorysettings 0x0
+bcdedit /set isolatedcontext No
+bcdedit /set vsmlaunchtype Off
+bcdedit /set vm No
+bcdedit /set nolowmem Yes
+bcdedit /set x2apicpolicy Enable
+bcdedit /set configaccesspolicy Default
+bcdedit /set MSI Default
+bcdedit /set usephysicaldestination No
+bcdedit /set usefirmwarepcisettings No
+bcdedit /set linearaddress57 OptOut
+bcdedit /set increaseuserva 268435328
+bcdedit /set bootmenupolicy Legacy
+bcdedit /set quietboot Yes
+bcdedit /set {globalsettings} custom:16000067 true
+bcdedit /set {globalsettings} custom:16000068 true
+bcdedit /set {globalsettings} custom:16000069 true
+bcdedit /timeout 3
+
+:: Enabling Windows Components...
+dism /online /enable-feature /featurename:DesktopExperience /all /norestart >nul 2>&1
+dism /online /enable-feature /featurename:LegacyComponents /all /norestart >nul 2>&1
+dism /online /enable-feature /featurename:DirectPlay /all /norestart >nul 2>&1
+dism /online /enable-feature /featurename:NetFx4-AdvSrvs /all /norestart >nul 2>&1
+dism /online /enable-feature /featurename:NetFx3 /all /norestart >nul 2>&1
+
+:: Process Scheduling
+reg add "HKLM\System\CurrentControlSet\Control\PriorityControl" /v "Win32PrioritySeparation" /t REG_DWORD /d "38" /f >nul 2>&1
+
+:: Disabling Mitigations...
+powershell "ForEach($v in (Get-Command -Name \"Set-ProcessMitigation\").Parameters[\"Disable\"].Attributes.ValidValues){Set-ProcessMitigation -System -Disable $v.ToString()}" >nul 2>&1
+
+:: Disabling RAM compression...
+powershell "Disable-MMAgent -MemoryCompression -ApplicationPreLaunch" >nul 2>&1
+
+:: Disable Meltdown/Spectre patches
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management" /v "EnableCfg" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettings" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverride" /t REG_DWORD /d "3" /f >nul 2>&1
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management" /v "FeatureSettingsOverrideMask" /t REG_DWORD /d "3" /f >nul 2>&1
+
+:: Disable DMA memory protection and cores isolation
+reg add "HKLM\Software\Policies\Microsoft\FVE" /v "DisableExternalDMAUnderLock" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\Software\Policies\Microsoft\Windows\DeviceGuard" /v "EnableVirtualizationBasedSecurity" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\Software\Policies\Microsoft\Windows\DeviceGuard" /v "HVCIMATRequired" /t REG_DWORD /d "0" /f >nul 2>&1
+
+:: Power settings
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "CsEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "EnergyEstimationEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "PerfCalculateActualUtilization" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "SleepReliabilityDetailedDiagnostics" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "EventProcessorEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "QosManagesIdleProcessors" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DisableVsyncLatencyUpdate" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Power" /v "DisableSensorWatchdog" /t REG_DWORD /d "1" /f >nul 2>&1
+
+:: Kernel settings
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "DpcWatchdogProfileOffset" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "DisableExceptionChainValidation" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "KernelSEHOPEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" /v "DpcWatchdogPeriod" /t REG_DWORD /d "0" /f >nul 2>&1
+
+:: Multimedia Profile
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile" /v "SystemResponsiveness" /t REG_DWORD /d "10" /f >nul 2>&1
+reg add "HKLM\Software\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games" /v "Priority" /t REG_DWORD /d "6" /f >nul 2>&1
+
+:: Disable NTFS/ReFS mitigations
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager" /v "ProtectionMode" /t REG_DWORD /d "0" /f >nul 2>&1
+
+:: Using big system memory caching to improve microstuttering
+reg add "HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management" /v "LargeSystemCache" /t REG_DWORD /d "1" /f >nul 2>&1
+
+::Force contiguous memory allocation in the DirectX Graphics Kernel
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "DpiMapIommuContiguous" /t REG_DWORD /d "1" /f >nul 2>&1
+
+:: Disable FSO Globally and GameDVR
+reg add "HKCU\Software\Microsoft\GameBar" /v "ShowStartupPanel" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\GameBar" /v "GamePanelStartupTipIndex" /t REG_DWORD /d "3" /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\GameBar" /v "AllowAutoGameMode" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\GameBar" /v "UseNexusForGameBarEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_Enabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehaviorMode" /t REG_DWORD /d "2" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_FSEBehavior" /t REG_DWORD /d "2" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_HonorUserFSEBehaviorMode" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_DXGIHonorFSEWindowsCompatible" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_EFSEFeatureFlags" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\System\GameConfigStore" /v "GameDVR_DSEBehavior" /t REG_DWORD /d "2" /f >nul 2>&1
+reg add "HKLM\Software\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR" /v "value" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\Software\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\GameDVR" /v "AppCaptureEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKU\.DEFAULT\Software\Microsoft\GameBar" /v "AutoGameModeEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore\Children" /f >nul 2>&1
+reg delete "HKCU\System\GameConfigStore\Parents" /f >nul 2>&1
+
+:: Disable power throttling
+reg add "HKLM\System\CurrentControlSet\Control\Power\PowerThrottling" /v "PowerThrottlingOff" /t REG_DWORD /d "1" /f >nul 2>&1
+
+:: Mouse fix
+reg add "HKCU\Control Panel\Mouse" /v "SmoothMouseXCurve" /t REG_BINARY /d "0000000000000000c0cc0c0000000000809919000000000040662600000000000033330000000000" /f >nul 2>&1
+reg add "HKCU\Control Panel\Mouse" /v "SmoothMouseYCurve" /t REG_BINARY /d "0000000000000000000038000000000000007000000000000000a800000000000000e00000000000" /f >nul 2>&1
+
+:: Explorer hide library
+reg add "HKCR\CLSID\{031E4825-7B94-4dc3-B131-E946B44C8DD5}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2962227469" /f >nul 2>&1
+reg add "HKCR\WOW6432Node\CLSID\{031E4825-7B94-4dc3-B131-E946B44C8DD5}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2962227469" /f >nul 2>&1
+:: Explorer hide Favorites
+reg add "HKCR\CLSID\{323CA680-C24D-4099-B94D-446DD2D7249E}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2696937728" /f >nul 2>&1
+reg add "HKCR\WOW6432Node\CLSID\{323CA680-C24D-4099-B94D-446DD2D7249E}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2696937728" /f >nul 2>&1
+:: Explorer hide family group
+reg add "HKCR\CLSID\{B4FB3F98-C1EA-428d-A78A-D1F5659CBA93}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2962489612" /f >nul 2>&1
+reg add "HKCR\WOW6432Node\CLSID\{B4FB3F98-C1EA-428d-A78A-D1F5659CBA93}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2962489612" /f >nul 2>&1
+:: Explorer hide network
+reg add "HKCR\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2954100836" /f >nul 2>&1
+reg add "HKCR\WOW6432Node\CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2954100836" /f >nul 2>&1
+:: Explorer hide OneDrive
+reg add "HKCR\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "4035969101" /f >nul 2>&1
+reg add "HKCR\WOW6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "4035969101" /f >nul 2>&1
+:: Explorer hide Quick Access
+reg add "HKCR\CLSID\{679f85cb-0220-4080-b29b-5540cc05aab6}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2689597440" /f >nul 2>&1
+reg add "HKCR\WOW6432Node\CLSID\{679f85cb-0220-4080-b29b-5540cc05aab6}\ShellFolder" /v "Attributes" /t "REG_DWORD" /d "2689597440" /f >nul 2>&1
+
+:: Taskbar Hide CortanaIcone
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Search" /v "SearchboxTaskbarMode" /t "REG_DWORD" /d "0" /f >nul 2>&1
+:: Taskbar Hide Task View
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ShowTaskViewButton" /t "REG_DWORD" /d "0" /f >nul 2>&1
+:: Taskbar Hide Action Center Tray
+reg add "HKCU\Software\Policies\Microsoft\Windows\Explorer" /v "DisableNotificationCenter" /t "REG_DWORD" /d "1" /f >nul 2>&1
+:: Taskbar Lock TaskBar
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarSizeMove" /t "REG_DWORD" /d "0" /f >nul 2>&1
+:: Taskbar Hide Contact icon
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\People" /v "PeopleBand" /t "REG_DWORD" /d "0" /f >nul 2>&1
+:: Taskbar Disable transparency taskbar
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" /v "EnableTransparency" /t "REG_DWORD" /d "0" /f >nul 2>&1
+
+:: Disable performance counter
+for %%i in (wsearchidxpi wmiaprpl usbhub ugthrsvc ugatherer termservice
+    tcpip spooler "smsvchost 5.0.0.0" "smsvchost 4.0.0.0"
+    "smsvchost 3.0.0.0" "servicemodelservice 3.0.0.0" tapisrv
+    "windows workflow foundation 3.0.0.0" "windows workflow foundation 4.0.0.0"
+    "windows workflow foundation 5.0.0.0" "servicemodeloperation 4.0.0.0"
+    "servicemodeloperation 3.0.0.0" "servicemodelendpoint 4.0.0.0"
+    "servicemodelendpoint 3.0.0.0" rdyboost perfproc perfnet perfdisk
+    outlook msscntrs "msdtc bridge 5.0.0.0" "msdtc bridge 4.0.0.0"
+    "msdtc bridge 3.0.0.0" msdtc lsa esent remoteaccess
+    bits aspnet_state asp.net_4.0.30319 asp.net ".netframework"
+    ".NET CLR Data" ".NET CLR Networking" ".NET CLR Networking 5.0.0.0"
+    ".NET CLR Networking 4.0.0.0" ".NET Data Provider for Oracle"
+    ".NET Data Provider for SqlServer" ".NET Memory Cache 4.0"
+    ".NET Memory Cache 4.1" perfos) do lodctr /d:%%i >nul 2>&1
+
+:: Disable Link power management mode
+for /f %%i in ('reg query "HKLM\System\CurrentControlSet\Services" /s /f "EnableHIPM"^| findstr /v "EnableHIPM"^| findstr "HKEY"') do (
+    reg add "%%i" /v "EnableHIPM" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "%%i" /v "EnableDIPM" /t REG_DWORD /d "0" /f >nul 2>&1
+)
+
+:: USB Hubs against power saving
+for /f %%i in ('wmic PATH Win32_USBHub GET DeviceID^| findstr /l "VID_"') do (
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "EnhancedPowerManagementEnabled" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "AllowIdleIrpInD3" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "DeviceSelectiveSuspended" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "SelectiveSuspendEnabled" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "SelectiveSuspendOn" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "fid_D1Latency" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "fid_D2Latency" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Enum\%%i\Device Parameters" /v "fid_D3Latency" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\usbflags" /v "fid_D1Latency" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\usbflags" /v "fid_D2Latency" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\usbflags" /v "fid_D3Latency" /t REG_DWORD /d "0" /f >nul 2>&1
+)
+
+:: StorPort against power saving
+for /f "tokens=*" %%i in ('reg query "HKLM\System\CurrentControlSet\Enum" /s /f "StorPort"^| findstr "StorPort"') do reg add "%%i" /v "EnableIdlePowerManagement" /t REG_DWORD /d "0" /f >nul 2>&1
+
+:: Remove IRQ Priorities
+for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /f "irq"^| findstr "irq"') do reg delete "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "%%i" /f >nul 2>&1
+
+:: Enable MSI mode & Remove MSI limits
+:: Settings DevicePolicy & DevicePriority
+for /f %%i in ('wmic path Win32_PnPEntity get DeviceID^| findstr /l "VEN_"') DO (
+	for /f "tokens=*" %%j in ('REG QUERY "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /s /f "MessageSignaledInterruptProperties"^| findstr /e "MessageSignaledInterruptProperties"') do (
+		reg add "%%j" /v "MSISupported" /t REG_DWORD /d "1" /f >nul 2>&1
+		reg delete "%%j" /v "MessageNumberLimit" /f >nul 2>&1
+	)
+
+	for /f "tokens=*" %%j in ('REG QUERY "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /s /f "Affinity Policy"^| findstr /e "Affinity Policy"') do (
+		reg add "%%j" /v "DevicePriority" /t REG_DWORD /d "2" /f >nul 2>&1
+		reg add "%%j" /v "DevicePolicy" /t REG_DWORD /d "5" /f >nul 2>&1
+	)
+)
+for /f "tokens=*" %%i in ('REG QUERY "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "Affinity Policy"^| findstr /e "Affinity Policy"^| findstr /v "VEN_"') do (
+	reg add "%%i" /v "DevicePriority" /T REG_DWORD /d "2" /f >nul 2>&1
+	reg add "%%i" /v "DevicePolicy" /T REG_DWORD /d "3" /f >nul 2>&1
+)
+
+:: Remove priorities of devices
+for /f "tokens=*" %%i in ('REG QUERY "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "AssignmentSetOverride"^| findstr "HKEY"') do (
+	reg delete "%%i" /v "AssignmentSetOverride" /f >nul 2>&1
+)
+
+:: DedicatedSegmentSize in Intel iGPU
+for /f %%i in ('reg query "HKLM\SOFTWARE\Intel" /s /f "GMM"^| findstr "HKEY"') do (
+	reg add "%%a" /v "DedicatedSegmentSize" /t REG_DWORD /d "4132" /f >nul 2>&1
+)
+
+:: Use big page file
+wmic computersystem where name="%computername%" set AutomaticManagedPagefile=False >nul 2>&1
+wmic pagefileset where name="C:\\pagefile.sys" set InitialSize=!PAGEFILE!,MaximumSize=!PAGEFILE! >nul 2>&1
+
+if "!LAPTOP!"=="False" (
+    echo test
+)
+
+:: SSD specefic
+if "!SSD!"=="True" (
+    fsutil behavior set disabledeletenotify 0
+)
+
+:: Nvidia specific
+if "!GPU!"=="NVIDIA"(
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "UseGpuTimer" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmGpsPsEnablePerCpuCoreDpc" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PowerSavingTweaks" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisableWriteCombining" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "EnableRuntimePowerManagement" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PrimaryPushBufferSize" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "FlTransitionLatency" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "D3PCLatency" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RMDeepLlEntryLatencyUsec" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PciLatencyTimerControl" /T REG_DWORD /d "32" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "Node3DLowLatency" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "LOWLATENCY" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmDisableRegistryCaching" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RMDisablePostL2Compression" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmFbsrPagedDMA" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "AdaptiveVsyncEnable" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "AllowDeepCStates" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisableGDIAcceleration" /T REG_DWORD /d "0" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisablePFonDP" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "Disable_OverlayDSQualityEnhancement" /T REG_DWORD /d "1" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "BuffersInFlight" /T REG_DWORD /d "128" /f >nul 2>&1
+	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v Display"!MonitorAmount!"_PipeOptimizationEnable /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Services\nvlddmkm\FTS" /v "EnableRID61684" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "PreferSystemMemoryContiguous" /t REG_DWORD /d "1" /f >nul 2>&1
+    :: Import Nvidia profile
+    start "" "resources\NvidiaProfileInspector.exe" "resources\Performance.nip" -silentImport
+)
+
+:: AMD specific
+if "!GPU!"=="AMD"(
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "DisableDMACopy" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "DisableBlockWrite" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "StutterMode" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "EnableUlps" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "PP_SclkDeepSleepDisable" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "PP_ThermalAutoThrottlingEnable" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "DisableDrmdmaPowerGating" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000\UMD" /v "Main3D_DEF" /t REG_STRING /d "1" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000\UMD" /v "Main3D" /t REG_BINARY /d "3100" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000\UMD" /v "ShaderCache" /t REG_BINARY /d "3200" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000\UMD" /v "Tessellation_OPTION" /t REG_BINARY /d "3200" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000\UMD" /v "Tessellation" /t REG_BINARY /d "3100" /f >nul 2>&1
+    reg add "HKLM\System\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000\UMD" /v "VSyncControl" /t REG_BINARY /d "3000" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\amdlog" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+)
+
+
+
+
 
 :: Services
-for %%i IN (BITS BrokerInfrastructure BFE EventSystem CDPSvc CDPUserSvc_%service% CoreMessagingRegistrar
+for %%i IN (BITS BrokerInfrastructure BFE EventSystem CDPSvc CDPUserSvc_!SERVICE! CoreMessagingRegistrar
 	CryptSvc DusmSvc DcomLaunch Dhcp Dnscache gpsvc LSM NlaSvc nsi Power PcaSvc RpcSs
-	RpcEptMapper SamSs ShellHWDetection sppsvc SysMain OneSyncSvc_%service% SENS
+	RpcEptMapper SamSs ShellHWDetection sppsvc SysMain OneSyncSvc_!SERVICE! SENS
 	SystemEventsBroker Schedule Themes UserManager ProfSvc AudioSrv AudioEndpointBuilder Wcmsvc WinDefend
 	MpsSvc SecurityHealthService EventLog FontCache Winmgmt WpnService WSearch LanmanWorkstation) DO (
 	reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
     if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
 )
 for %%i IN (AxInstSV AppReadiness AppIDSvc Appinfo AppXSVC BDESVC wbengine camsvc ClipSVC KeyIso
-	COMSysApp Browser PimIndexMaintenanceSvc_%service% VaultSvc DsSvc DeviceAssociationService
-	DeviceInstall DmEnrollmentSvc DsmSVC DevicesFlowUserSvc_%service% DevQueryBroker diagsvc
+	COMSysApp Browser PimIndexMaintenanceSvc_!SERVICE! VaultSvc DsSvc DeviceAssociationService
+	DeviceInstall DmEnrollmentSvc DsmSVC DevicesFlowUserSvc_!SERVICE! DevQueryBroker diagsvc
 	WdiSystemHost MSDTC embeddedmode EFS EntAppSvc EapHost fhsvc fdPHost FDResPub GraphicsPerfSvc
-	hidserv IKEEXT UI0Detect PolicyAgent KtmRm lltdsvc wlpasvc MessagingService_%service% wlidsvc
+	hidserv IKEEXT UI0Detect PolicyAgent KtmRm lltdsvc wlpasvc MessagingService_!SERVICE! wlidsvc
 	NgcSvc NgcCtnrSvc swprv smphost Netman NcaSVC netprofm NetSetupSvc defragsvc PNRPsvc p2psvc
-	p2pimsvc PerfHost pla PlugPlay PNRPAutoReg WPDBusEnum PrintNotify PrintWorkflowUserSvc_%service%
+	p2pimsvc PerfHost pla PlugPlay PNRPAutoReg WPDBusEnum PrintNotify PrintWorkflowUserSvc_!SERVICE!
 	wercplsupport QWAVE RmSvc RasAuto RasMan seclogon SstpSvc SharedRealitySvc svsvc SSDPSRV
 	StateRepository WiaRpc StorSvc TieringEngineService lmhosts TapiSrv tiledatamodelsvc TimeBroker
-	UsoSvc upnphost UserDataSvc_%service% UnistoreSvc_%service% vds VSS WalletService TokenBroker
+	UsoSvc upnphost UserDataSvc_!SERVICE! UnistoreSvc_!SERVICE! vds VSS WalletService TokenBroker
 	SDRSVC Sense WdNisSvc WEPHOSTSVC WerSvc Wecsvc StiSvc msiserver LicenseManager TrustedInstaller
-	spectrum WpnUserService_%service% InstallService W32Time wuauserv WinHttpAutoProxySvc dot3svc
+	spectrum WpnUserService_!SERVICE! InstallService W32Time wuauserv WinHttpAutoProxySvc dot3svc
 	WlanSvc wmiApSrv XboxGipSvc) do (
 	reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
 	if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
@@ -187,10 +471,9 @@ for %%i in (AJRouter ALG AppMgmt tzautoupdate BthHFSrv bthserv PeerDistSvc CertP
     if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 
-call "modules\choicebox.exe" "Disable Windows Search; Disable OneDrive; Disable Windows Store; Disable Xbox Apps; Disable Wi-Fi; Disable Bluetooth; Disable Printer; Disable Hyper-V; Disable Remote Desktop; Disable Task Scheduler; Disable Compatibility Assistant; Disable Diagnostic; Disable Disk Management; Disable Windows Update; Disable Windows Defender; Disable Windows Firewall" " " "Services Manager" /C:2 >"%TMP%\services.txt"
+call "modules\choicebox.exe" "Disable Windows Search; Disable OneDrive; Disable Windows Store; Disable Xbox Apps; Disable Wi-Fi; Disable Bluetooth; Disable Printer; Disable Hyper-V; Disable Remote Desktop; Disable Task Scheduler; Disable Compatibility Assistant; Disable Disk Management; Disable Windows Update; Disable Windows Defender; Disable Windows Firewall" " " "Services" /C:2 >"%TMP%\services.txt"
 findstr /c:"Disable Windows Search" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Windows Search...
     reg add "HKLM\System\CurrentControlSet\Services\wsearch" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\TabletInputService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "AllowCortana" /t REG_DWORD /d 0 /f >nul 2>&1
@@ -207,18 +490,20 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKCU\SOFTWARE\Microsoft\Personalization\Settings" /v "AcceptedPrivacyPolicy" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "DeviceHistoryEnabled" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" /v "HistoryViewEnabled" /t REG_DWORD /d 0 /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "ctfmon" /t REG_STRING /d "CTFMON.EXE" /f >nul 2>&1
+    powershell "Get-AppxPackage -AllUsers | Where {($_.Name -like '*Search*')} | Where {($_.Name -like '*Cortana*')} | Where {($_.Name -like '*TextInput*')} | Where {($_.Name -like '*ExperienceHost*')} | Remove-AppxPackage" >nul 2>&1
+    powershell "Get-AppxProvisionedPackage -Online | Where {($_.Name -like '*Search*')} | Where {($_.Name -like '*Cortana*')} | Where {($_.Name -like '*TextInput*')} | Where {($_.Name -like '*ExperienceHost*')} | Remove-AppxProvisionedPackage -Online" >nul 2>&1
 )
 findstr /c:"Disable OneDrive" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling OneDrive...
     taskkill /f /im OneDrive.exe >nul 2>&1
-    if exist %SystemRoot%\System32\OneDriveSetup.exe start /wait %SystemRoot%\System32\OneDriveSetup.exe /uninstall >nul 2>&1
+    if exist "%windir%\System32\OneDriveSetup.exe" start /wait "%windir%\System32\OneDriveSetup.exe" /uninstall >nul 2>&1
     rd "%UserProfile%\OneDrive" /q /s >nul 2>&1
     rd "%SystemDrive%\OneDriveTemp" /q /s >nul 2>&1
     rd "%LocalAppData%\Microsoft\OneDrive" /q /s >nul 2>&1
     rd "%ProgramData%\Microsoft OneDrive" /q /s >nul 2>&1
-    reg delete "HKEY_CLASSES_ROOT\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f >nul 2>&1
-    reg delete "HKEY_CLASSES_ROOT\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f >nul 2>&1
+    reg delete "HKCR\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f >nul 2>&1
+    reg delete "HKCR\Wow6432Node\CLSID\{018D5C66-4533-4307-9B53-224DE2ED1FE6}" /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncNGSC" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSync" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\OneDrive" /v "DisableMeteredNetworkFileSync" /t REG_DWORD /d "1" /f >nul 2>&1
@@ -227,7 +512,6 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Windows Store" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Windows Store...
     reg add "HKLM\System\CurrentControlSet\Services\iphlpsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\ClipSVC" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\AppXSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -245,19 +529,21 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v "DODownloadMode" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" /v "SystemSettingsDownloadMode" /t REG_DWORD /d 0 /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\DoSvc" /v "Start" /t REG_DWORD /d 4 /f >nul 2>&1
+    powershell "Get-AppxPackage -AllUsers | Where {($_.Name -like '*store*')} | Remove-AppxPackage" >nul 2>&1
+    powershell "Get-AppxProvisionedPackage -Online | Where {($_.Name -like '*store*')} | Remove-AppxProvisionedPackage -Online" >nul 2>&1
 )
 findstr /c:"Disable Xbox Apps" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Xbox Apps...
     reg add "HKLM\System\CurrentControlSet\Services\XboxNetApiSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\XblGameSave" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\XblAuthManager" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\xbgm" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\XboxGipSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+    powershell "Get-AppxPackage -AllUsers | Where {($_.Name -like '*xbox*')} | Remove-AppxPackage" >nul 2>&1
+    powershell "Get-AppxProvisionedPackage -Online | Where {($_.Name -like '*xbox*')} | Remove-AppxProvisionedPackage -Online" >nul 2>&1
 )
 findstr /c:"Disable Wi-Fi" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Wi-Fi...
     reg add "HKLM\System\CurrentControlSet\Services\WwanSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\WlanSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\wcncsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -267,7 +553,6 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Bluetooth" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Bluetooth...
     reg add "HKLM\System\CurrentControlSet\Services\BTAGService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\bthserv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\BthAvctpSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -276,7 +561,6 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Printer" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Printer...
     reg add "HKLM\System\CurrentControlSet\Services\LanmanServer" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\Fax" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\Spooler" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -285,7 +569,6 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Hyper-V" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Hyper-V...
     reg add "HKLM\System\CurrentControlSet\Services\HvHost" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\vmickvpexchange" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\vmicguestinterface" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -298,7 +581,6 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Remote Desktop" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Remote Desktop...
     reg add "HKLM\System\CurrentControlSet\Services\RasAuto" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\RasMan" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\SessionEnv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -309,38 +591,21 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Task Scheduler" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Task Scheduler...
     reg add "HKLM\System\CurrentControlSet\Services\Schedule" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\TimeBrokerSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Compatibility Assistant" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Compatibility Assistant...
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t REG_DWORD /d 1 /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\PcaSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
-findstr /c:"Disable Diagnostic" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
-    echo Disabling Diagnostic...
-    reg add "HKLM\System\CurrentControlSet\Services\DiagTrack" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\diagsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\DPS" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\WdiServiceHost" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\WdiSystemHost" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\dmwappushsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\diagnosticshub.standardcollector.service" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\TroubleshootingSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-    reg add "HKLM\System\CurrentControlSet\Services\DsSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
-)
 findstr /c:"Disable Disk Management" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Disk Management...
     reg add "HKLM\System\CurrentControlSet\Services\defragsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\vds" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Windows Update" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Windows Update...
     reg add "HKLM\System\CurrentControlSet\Services\wuauserv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\WaaSMedicSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\PeerDistSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -372,7 +637,6 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Windows Defender" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Windows Defender...
     reg add "HKLM\System\CurrentControlSet\Services\Sense" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\WdNisSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\WinDefend" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -399,7 +663,6 @@ if %ERRORLEVEL% equ 0 (
 )
 findstr /c:"Disable Windows Firewall" "%TMP%\services.txt" >nul 2>&1
 if %ERRORLEVEL% equ 0 (
-    echo Disabling Windows Firewall...
     reg add "HKLM\System\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\BFE" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\System\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile" /v "EnableFirewall" /t REG_DWORD /d 00000000 /f >nul 2>&1
@@ -430,7 +693,7 @@ for %%i in (AcpiDev CAD CldFlt FileCrypt GpuEnergyDrv PptpMiniport RapiMgr RasAg
     lltdio luafv Modem MpsSvc mrxsmb Mrxsmb10 Mrxsmb20 MsLldp mssmbios NdisCap NdisTapi
     NdisVirtualBus NdisWan Ndproxy Ndu NetBIOS NetBT Npsvctrig PEAUTH Psched QWAVEdrv
     RasAcd RasPppoe rdbss rdpbus rdyboost rspndr spaceport srv2 Srvnet TapiSrv Tcpip6
-    tcpipreg tdx TPM umbus vdrvroot Vid Volmgrx WmiAcpi ws2ifsl AFD) do (
+    tcpipreg tdx TPM umbus vdrvroot Vid Volmgrx WmiAcpi ws2ifsl) do (
     reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
     if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
@@ -444,6 +707,8 @@ netsh int ip set global neighborcachelimit=4096 >nul 2>&1
 netsh int tcp set global dca=enabled >nul 2>&1
 netsh int tcp set global netdma=enabled >nul 2>&1
 netsh int tcp set supplemental internet congestionprovider=CUBIC >nul 2>&1
+wmic nicconfig where TcpipNetbiosOptions=0 call SetTcpipNetbios 2
+wmic nicconfig where TcpipNetbiosOptions=1 call SetTcpipNetbios 2
 reg add "HKLM\System\CurrentControlSet\Services\Tcpip\Parameters" /v "EnableICMPRedirect" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\System\CurrentControlSet\Services\Tcpip\Parameters" /v "EnablePMTUDiscovery" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\System\CurrentControlSet\Services\Tcpip\Parameters" /v "Tcp1323Opts" /t REG_DWORD /d "0" /f >nul 2>&1
@@ -510,7 +775,7 @@ powershell "Disable-NetAdapterPowerManagement -Name *" >nul 2>&1
 powershell "Disable-NetAdapterChecksumOffload -Name *" >nul 2>&1
 powershell "Disable-NetAdapterEncapsulatedPacketTaskOffload -Name *" >nul 2>&1
 powershell "Disable-NetAdapterQos -Name *" >nul 2>&1
-for %%i in (ms_lldp ms_lltdio ms_msclient ms_rspndr ms_server ms_implat ms_pacer) do powershell "Disable-NetAdapterBinding -Name * -ComponentID %%i" >nul 2>&1
+for %%i in (ms_lldp ms_lltdio ms_msclient ms_rspndr ms_server ms_implat ms_pacer ms_tcpip6) do powershell "Disable-NetAdapterBinding -Name * -ComponentID %%i" >nul 2>&1
 for %%i in ("Ultra Low Power Mode" "Green Ethernet" "Gigabit Lite"
     "Enable PME" "Ultra Low Power Mode" "System Idle Power Saver"
     "Idle Power Saving" "Advanced EEE" "Log Link State Event"
@@ -529,7 +794,6 @@ powershell "Set-NetAdapterAdvancedProperty -Name '*' -DisplayName 'Receive Buffe
 powershell "Set-NetAdapterAdvancedProperty -Name '*' -DisplayName 'Receive Side Scaling' -DisplayValue 'On'" >nul 2>&1
 powershell "Set-NetAdapterAdvancedProperty -Name '*' -DisplayName 'Maximum Number of RSS Queues' -DisplayValue '1 Queues'" >nul 2>&1
 powershell "Set-NetAdapterAdvancedProperty -Name '*' -RegistryKeyword 'TxIntDelay' -RegistryValue '5'" >nul 2>&1
-::wifi specific
 powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'ARP offload for WoWLAN' -DisplayValue 'Disabled'" >nul 2>&1
 powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'NS offloading for WoWLAN' -DisplayValue 'Disabled'" >nul 2>&1
 powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'GTK rekeying for WoWLAN' -DisplayValue 'Disabled'" >nul 2>&1
@@ -537,6 +801,7 @@ powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'Roaming A
 powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'Preferred Band' -DisplayValue '3. Prefer 5GHz band'" >nul 2>&1
 powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'Transmit Power' -DisplayValue '5. Highest'" >nul 2>&1
 powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'Throughput Booster' -DisplayValue 'Enabled'" >nul 2>&1
+powershell "Set-NetAdapterAdvancedProperty -Name 'Wi-Fi' -DisplayName 'U-APSD support' -DisplayValue 'Disabled'" >nul 2>&1
 
 :: Set static ip
 set DNS1=1.1.1.1
@@ -558,38 +823,29 @@ if "%DHCP%"=="Yes" (
 for %%i in ("Microsoft Kernel Debug Network Adapter" "WAN Miniport" "Teredo Tunneling"
     "UMBus Root Bus Enumerator" "Composite Bus Enumerator" "Microsoft Virtual Drive Enumerator"
     "NDIS Virtual Network Adapter Enumerator" "System Timer" "Programmable Interrupt Controller"
-    "PCI standard RAM Controller" "PCI Simple Communications Controller" "Numeric Data Processor"
+    "PCI standard RAM Controller" "PCI Simple Communications Controller" "Numeric Data Processor" "NVIDIA USB"
     "Intel Management Engine" "Intel SMBus" "AMD PSP" "SM Bus Controller" "Remote Desktop Device Redirector Bus"
-    "Microsoft System Management BIOS Driver" "Microsoft GS Wavetable Synth" "NVIDIA High Definition Audio" "NVIDIA USB"
+    "Microsoft System Management BIOS Driver" "Microsoft GS Wavetable Synth" "NVIDIA High Definition Audio" "Microsoft Wi-Fi Direct Virtual Adapter"
     "HID-compliant Consumer Control Device" "HID-compliant System Controller" "HID-compliant Vendor-Defined Device" "High Precision Event Timer") do powershell "Get-PnpDevice | Where-Object {$_.FriendlyName -match '%%i'} | Disable-PnpDevice -Confirm:$false" >nul 2>&1
 
-:: Install AeroLite
-IF EXIST "%WinDir%\Resources\Themes\aero\aerolite.msstyles" (
-    powershell "$content = [System.IO.File]::ReadAllText('%WinDir%\Resources\Themes\aero.theme').Replace('%ResourceDir%\Themes\Aero\Aero.msstyles','%ResourceDir%\Themes\Aero\Aerolite.msstyles'); [System.IO.File]::WriteAllText('%WinDir%\Resources\Themes\aerolite.theme', $content)"
-    IF EXIST "%WinDir%\Resources\Themes\light.theme" (
-        powershell "$content = [System.IO.File]::ReadAllText('%WinDir%\Resources\Themes\light.theme').Replace('%ResourceDir%\Themes\Aero\Aero.msstyles','%ResourceDir%\Themes\Aero\Aerolite.msstyles'); [System.IO.File]::WriteAllText('%WinDir%\Resources\Themes\lightlite.theme', $content)"
-    )
-)
+:: Clean non-present devices
+call "modules\devicecleanup.exe" * -s -n >nul 2>&1
+
+:: Devices power management
+
 
 :: Import Power Plan
 powercfg -query 33333333-3333-3333-3333-333333333333 >nul 2>&1
 if %ERRORLEVEL% equ 0 powercfg -delete 33333333-3333-3333-3333-333333333333 >nul 2>&1
 powercfg -import "%~dp0\resources\ExtremePerformance.pow" 33333333-3333-3333-3333-333333333333 >nul 2>&1
 powercfg -setactive 33333333-3333-3333-3333-333333333333 >nul 2>&1
-powercfg -h off >nul 2>&1
-
-:: Import Nvidia profile
-start "" "resources\NvidiaProfileInspector.exe" "resources\Performance.nip" -silentImport
 
 :: Windows apps
 call :MSGBOX "Would you like to remove Windows Applications ?" vbYesNo+vbQuestion "Windows Apps Remover"
 if %ERRORLEVEL% equ 6 (
-    powershell "Get-AppxPackage -AllUsers | Where {($_.Name -notlike '*store*')} | Where {($_.Name -notlike '*xbox*')} | Where {($_.Name -notlike '*calculator*')} | Where {($_.Name -notlike '*Search*')} | Where {($_.Name -notlike '*ExperienceHost*')} | Where {($_.Name -notlike '*immersive*')} | Where {($_.Name -notlike '*NET.Native*')} | Where {($_.Name -notlike '*VCLibs*')} | Where {($_.Name -notlike '*Language*')} | Remove-AppxPackage" >nul 2>&1
-    powershell "Get-AppxProvisionedPackage -Online | Where {($_.Name -notlike '*store*')} | Where {($_.Name -notlike '*xbox*')} | Where {($_.Name -notlike '*calculator*')} | Where {($_.Name -notlike '*Search*')} | Where {($_.Name -notlike '*ExperienceHost*')} | Where {($_.Name -notlike '*immersive*')} | Where {($_.Name -notlike '*NET.Native*')} | Where {($_.Name -notlike '*VCLibs*')} | Where {($_.Name -notlike '*Language*')} | Remove-AppxProvisionedPackage -Online" >nul 2>&1
+    powershell "Get-AppxPackage -AllUsers | Where {($_.Name -notlike '*store*')} | Where {($_.Name -notlike '*xbox*')} | Where {($_.Name -notlike '*calculator*')} | Where {($_.Name -notlike '*Search*')} | Where {($_.Name -notlike '*Cortana*')} | Where {($_.Name -notlike '*TextInput*')} | Where {($_.Name -notlike '*ExperienceHost*')} | Where {($_.Name -notlike '*immersive*')} | Where {($_.Name -notlike '*NET.Native*')} | Where {($_.Name -notlike '*VCLibs*')} | Where {($_.Name -notlike '*Language*')} | Remove-AppxPackage" >nul 2>&1
+    powershell "Get-AppxProvisionedPackage -Online | Where {($_.Name -notlike '*store*')} | Where {($_.Name -notlike '*xbox*')} | Where {($_.Name -notlike '*calculator*')} | Where {($_.Name -notlike '*Search*')} | Where {($_.Name -notlike '*Cortana*')} | Where {($_.Name -notlike '*TextInput*')} | Where {($_.Name -notlike '*ExperienceHost*')} | Where {($_.Name -notlike '*immersive*')} | Where {($_.Name -notlike '*NET.Native*')} | Where {($_.Name -notlike '*VCLibs*')} | Where {($_.Name -notlike '*Language*')} | Remove-AppxProvisionedPackage -Online" >nul 2>&1
 )
-
-:: Fix Windows typing
-reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run" /v "ctfmon" /t REG_STRING /d "CTFMON.EXE" /f >nul 2>&1
 
 :: Telemetry
 reg add "HKCU\Control Panel\International\User Profile" /v "HttpAcceptLanguageOptOut" /t REG_DWORD /d "1" /f >nul 2>&1
@@ -608,10 +864,19 @@ reg add "HKLM\Software\Policies\Microsoft\Windows\OneDrive" /v "DisableFileSyncN
 reg add "HKLM\Software\Policies\Microsoft\Windows\safer\codeidentifiers" /v "authenticodeenabled" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\Software\Policies\Microsoft\Windows\Windows Error Reporting" /v "DontSendAdditionalData" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d "0" /f >nul 2>&1
-for %%i in (AutoLogger-Diagtrack-Listener Diagtrack-Listener Audio LwtNetLog NetCfgTrace ReadyBoot SCM SQMLogger WiFiSession UserNotPresentTraceSession WindowsUpdate_trace_log) do (
+for %%i in (AutoLogger-Diagtrack-Listener AppModel Cellcore CloudExperienceHostOobe
+    DataMarket DefenderApiLogger DefenderAuditLogger DiagLog HolographicDevice iclsClient
+    iclsProxy LwtNetLog Mellanox-Kernel Microsoft-Windows-AssignedAccess-Trace Microsoft-Windows-Setup
+    NBSMBLOGGER PEAuthLog RdrLog ReadyBoot SetupPlatform SetupPlatformTel SocketHeciServer
+    SpoolerLogger SQMLogger TCPIPLOGGER TileStore Tpm TPMProvisioningService UBPM WdiContextLog
+    WFP-IPsec Trace WiFiDriverIHVSession WiFiDriverIHVSessionRepro WiFiSession WinPhoneCritical) do (
     reg query "HKLM\System\CurrentControlSet\Control\WMI\AutoLogger\%%i" /ve >nul 2>&1
     if %ERRORLEVEL% equ 0 reg add "HKLM\System\CurrentControlSet\Control\WMI\AutoLogger\%%i" /v "Start" /t REG_DWORD /d "0" /f >nul 2>&1
 )
+reg add "HKLM\System\CurrentControlSet\Control\WMI\AutoLogger\Circular Kernel Context Logger" /v "Start" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WUDF" /v "LogEnable" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WUDF" /v "LogLevel" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa\Credssp" /v "DebugLogLevel" /t REG_DWORD /d "0" /f >nul 2>&1
 
 :: Scheduled tasks
 schtasks /change /tn "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /disable >nul 2>&1
@@ -646,8 +911,34 @@ for /f "tokens=1 delims=," %%i in ('schtasks /query /fo csv ^| findstr /v "TaskN
 schtasks /change /tn "USER_ESRV_SVC_QUEENCREEK" /disable
 
 :: Hosts
-call :CURL -L "https://gameindustry.eu/files/hosts.txt" --create-dirs -o "%systemroot%\System32\drivers\etc\hosts" >nul 2>&1
+call :CURL -L "https://gameindustry.eu/files/hosts.txt" --create-dirs -o "%windir%\System32\drivers\etc\hosts" >nul 2>&1
 
+:: Enable HRTF...
+echo hrtf ^= true > "%appdata%\alsoft.ini"
+echo hrtf ^= true > "%ProgramData%\alsoft.ini"
+
+:: Install Simple DirectMedia Layer
+if not exist "%windir%\System32\SDL.dll" copy "resources\SDL.dll" "%windir%\SysWOW64" >nul 2>&1
+if not exist "%windir%\SysWOW64\SDL.dll" copy "resources\SDL.dll" "%windir%\SysWOW64" >nul 2>&1
+
+:: Install Timer resolution service
+call "resources\SetTimerResolutionService.exe" -Install >nul 2>&1
+
+:: Process Explorer
+taskkill /f /im procexp.exe >nul 2>&1
+if not exist "%windir%\System32\procexp.exe" copy "resources\procexp.exe" "%windir%\System32" >nul 2>&1
+reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\taskmgr.exe" /v "Debugger" /t REG_SZ /d "%windir%\System32\procexp.exe" /f >nul 2>&1
+
+:: Install StartisBack
+call "resources\StartIsBack.exe" /silent >nul 2>&1
+
+:: Install Dark Theme
+call :CURL -L "https://gist.githubusercontent.com/ArtanisInc/1c37e010b5baa4e72d5481e978ac8617/raw/349e1f2c36680f832180ec4111c0e37291c09c65/BlackLess.theme" --create-dirs -o "%WinDir%\Resources\Themes\BlackLess.theme" >nul 2>&1
+call :CURL -L "https://gist.githubusercontent.com/ArtanisInc/1c37e010b5baa4e72d5481e978ac8617/raw/349e1f2c36680f832180ec4111c0e37291c09c65/WhiteLess.theme" --create-dirs -o "%WinDir%\Resources\Themes\WhiteLess.theme" >nul 2>&1
+call :MSGBOX "Do you want to apply BlackLess Theme ?" vbYesNo+vbQuestion "System Restore"
+if %ERRORLEVEL% equ 6 start "" "%WinDir%\Resources\Themes\BlackLess.theme"
+
+:: Reboot
 call :MSGBOX "Some registry changes may require a reboot to take effect.\n\nWould you like to restart now?" vbYesNo+vbQuestion "Shut Down Windows"
 if %ERRORLEVEL% equ 6 shutdown -r -f -t 0
 timeout /t 1 /nobreak >nul 2>&1
@@ -1083,99 +1374,101 @@ timeout /t 3 /nobreak >nul 2>&1
 goto TOOLS_MENU
 
 :TOOLS_INSTALL
-set "OPENTOOLS=false"
+set "OPENTOOLS=False"
 :: UTILITIES
-if "!NSudo!"=="[40;95m[[40;33mx[40;95m][40;37m NSudo" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755786967660101702/NSudo.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\NSudo.exe"
-if "!Autoruns!"=="[40;95m[[40;33mx[40;95m][40;37m Autoruns" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755789664627064902/Autoruns.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Autoruns.exe"
-if "!ServiWin!"=="[40;95m[[40;33mx[40;95m][40;37m ServiWin" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755791010893660190/ServiWin.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\ServiWin.exe"
-if "!Memory Booster!"=="[40;95m[[40;33mx[40;95m][40;37m Memory Booster" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755787065974849638/MemoryBooster_2.1.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\MemoryBooster.exe"
-if "!Device Cleanup!"=="[40;95m[[40;33mx[40;95m][40;37m Device Cleanup" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755790659356590080/DeviceCleanup.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\DeviceCleanup.exe"
+if "!NSudo!"=="[40;95m[[40;33mx[40;95m][40;37m NSudo" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755786967660101702/NSudo.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\NSudo.exe"
+if "!Autoruns!"=="[40;95m[[40;33mx[40;95m][40;37m Autoruns" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755789664627064902/Autoruns.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Autoruns.exe"
+if "!ServiWin!"=="[40;95m[[40;33mx[40;95m][40;37m ServiWin" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755791010893660190/ServiWin.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\ServiWin.exe"
+if "!Memory Booster!"=="[40;95m[[40;33mx[40;95m][40;37m Memory Booster" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755787065974849638/MemoryBooster_2.1.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\MemoryBooster.exe"
+if "!Device Cleanup!"=="[40;95m[[40;33mx[40;95m][40;37m Device Cleanup" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755790659356590080/DeviceCleanup.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\DeviceCleanup.exe"
 if "!MSI Afterburner!"=="[40;95m[[40;33mx[40;95m][40;37m MSI Afterburner" call :CHOCO msiafterburner
 :: SYSTEM INFOS
-if "!CPU-Z!"=="[40;95m[[40;33mx[40;95m][40;37m CPU-Z" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755790662346997910/CPU-Z.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\CPU-Z.exe"
-if "!GPU-Z!"=="[40;95m[[40;33mx[40;95m][40;37m GPU-Z" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://nl1-dl.techpowerup.com/files/GPU-Z.2.34.0.exe#/GPU-Z.2.34.0.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\GPU-Z.exe"
+if "!CPU-Z!"=="[40;95m[[40;33mx[40;95m][40;37m CPU-Z" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755790662346997910/CPU-Z.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\CPU-Z.exe"
+if "!GPU-Z!"=="[40;95m[[40;33mx[40;95m][40;37m GPU-Z" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://nl1-dl.techpowerup.com/files/GPU-Z.2.34.0.exe#/GPU-Z.2.34.0.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\GPU-Z.exe"
 if "!HWiNFO!"=="[40;95m[[40;33mx[40;95m][40;37m HWiNFO" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://www.sac.sk/download/utildiag/hwi_630.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\HWiNFO\hwi_630.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\HWiNFO\hwi_630.zip" -O"%USERPROFILE%\Documents\_Tools\HWiNFO" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\HWiNFO\hwi_630.zip" >nul 2>&1
 )
 if "!CrystalDiskInfo!"=="[40;95m[[40;33mx[40;95m][40;37m CrystalDiskInfo" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://dotsrc.dl.osdn.net/osdn/crystaldiskinfo/73507/CrystalDiskInfo8_8_7.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo8_8_7.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo8_8_7.zip"  -O"%USERPROFILE%\Documents\_Tools\CrystalDiskInfo">nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo8_8_7.zip" >nul 2>&1
 )
 :: DRIVERS
 if "!Snappy Driver Installer!"=="[40;95m[[40;33mx[40;95m][40;37m Snappy Driver Installer" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "http://sdi-tool.org/releases/SDI_R2000.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Snappy Driver Installer\SDI.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\Snappy Driver Installer\SDI.zip"  -O"%USERPROFILE%\Documents\_Tools\Snappy Driver Installer">nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\Snappy Driver Installer\SDI.zip" >nul 2>&1
 )
-if "!NVCleanstall!"=="[40;95m[[40;33mx[40;95m][40;37m NVCleanstall" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://nl1-dl.techpowerup.com/files/NVCleanstall_1.7.0.exe#/NVCleanstall.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\NVCleanstall.exe"
+if "!NVCleanstall!"=="[40;95m[[40;33mx[40;95m][40;37m NVCleanstall" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://nl1-dl.techpowerup.com/files/NVCleanstall_1.7.0.exe#/NVCleanstall.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\NVCleanstall.exe"
 if "!Radeon Software Slimmer!"=="[40;95m[[40;33mx[40;95m][40;37m Radeon Software Slimmer" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://github.com/GSDragoon/RadeonSoftwareSlimmer/releases/download/1.0.0-beta.6/RadeonSoftwareSlimmer_1.0.0-beta.6_net48.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Radeon Software Slimmer\RadeonSoftwareSlimmer.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\Radeon Software Slimmer\RadeonSoftwareSlimmer.zip"  -O"%USERPROFILE%\Documents\_Tools\Radeon Software Slimmer">nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\Radeon Software Slimmer\RadeonSoftwareSlimmer.zip" >nul 2>&1
 )
 if "!Display Driver Uninstaller!"=="[40;95m[[40;33mx[40;95m][40;37m Display Driver Uninstaller" (
-    set "OPENTOOLS=true"
-    call :CURL -L --progress-bar "http://download-eu2.guru3d.com/ddu/[Guru3D.com]-DDU.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU.zip"
-    call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU.zip" -O"%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller" >nul 2>&1
-    del /f /q "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU.zip" >nul 2>&1
+    set "OPENTOOLS=True"
+    call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/762442679254384690/DDU.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU.exe"
+    call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU.exe" -O"%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller" >nul 2>&1
+    move "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU v18.0.3.3\*" "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller" >nul 2>&1
+    rd /s /q "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU v18.0.3.3" >nul 2>&1
+    del /f /q "%USERPROFILE%\Documents\_Tools\Display Driver Uninstaller\DDU.exe" >nul 2>&1
 )
 :: BENCHMARK & STRESS
 if "!Unigine Superposition!"=="[40;95m[[40;33mx[40;95m][40;37m Unigine Superposition" call :CHOCO superposition-benchmark
 if "!CINEBENCH!"=="[40;95m[[40;33mx[40;95m][40;37m CINEBENCH" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "http://http.maxon.net/pub/cinebench/CinebenchR20.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Cinebench\CinebenchR20.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\Cinebench\CinebenchR20.zip" -O"%USERPROFILE%\Documents\_Tools\Cinebench" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\Cinebench\CinebenchR20.zip" >nul 2>&1
 )
 if "!AIDA64!"=="[40;95m[[40;33mx[40;95m][40;37m AIDA64" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://download.aida64.com/aida64extreme625.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\AIDA64\aida64extreme625.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\AIDA64\aida64extreme625.zip" -O"%USERPROFILE%\Documents\_Tools\AIDA64" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\AIDA64\aida64extreme625.zip" >nul 2>&1
 )
-if "!OCCT!"=="[40;95m[[40;33mx[40;95m][40;37m OCCT" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://www.ocbase.com/download" --create-dirs -o "%USERPROFILE%\Documents\_Tools\OCCT.exe"
+if "!OCCT!"=="[40;95m[[40;33mx[40;95m][40;37m OCCT" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://www.ocbase.com/download" --create-dirs -o "%USERPROFILE%\Documents\_Tools\OCCT.exe"
 :: TWEAKS
-if "!MSI Util v3!"=="[40;95m[[40;33mx[40;95m][40;37m MSI Util v3" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755786950610255896/MSI_util_v3.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\MSI_util_v3.exe"
-if "!Interrupt Affinity!"=="[40;95m[[40;33mx[40;95m][40;37m Interrupt Affinity" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755786953223438346/InterruptAffinity.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\InterruptAffinity.exe"
-if "!TCP Optimizer!"=="[40;95m[[40;33mx[40;95m][40;37m TCP Optimizer" set "OPENTOOLS=true" & call :CURL -L --progress-bar "https://www.speedguide.net/files/TCPOptimizer.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\TCPOptimizer.exe"
+if "!MSI Util v3!"=="[40;95m[[40;33mx[40;95m][40;37m MSI Util v3" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755786950610255896/MSI_util_v3.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\MSI_util_v3.exe"
+if "!Interrupt Affinity!"=="[40;95m[[40;33mx[40;95m][40;37m Interrupt Affinity" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://cdn.discordapp.com/attachments/595370063104573511/755786953223438346/InterruptAffinity.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\InterruptAffinity.exe"
+if "!TCP Optimizer!"=="[40;95m[[40;33mx[40;95m][40;37m TCP Optimizer" set "OPENTOOLS=True" & call :CURL -L --progress-bar "https://www.speedguide.net/files/TCPOptimizer.exe" --create-dirs -o "%USERPROFILE%\Documents\_Tools\TCPOptimizer.exe"
 if "!WLAN Optimizer!"=="[40;95m[[40;33mx[40;95m][40;37m WLAN Optimizer" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "http://www.martin-majowski.de/downloads/wopt021.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\WLAN Optimizer\wopt.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\WLAN Optimizer\wopt.zip" -O"%USERPROFILE%\Documents\_Tools\WLAN Optimizer" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\WLAN Optimizer\wopt.zip" >nul 2>&1
 )
 if "!Nvidia Profile Inspector!"=="[40;95m[[40;33mx[40;95m][40;37m Nvidia Profile Inspector" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/download/2.3.0.12/nvidiaProfileInspector.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Nvidia Profile Inspector\nvidiaProfileInspector.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\Nvidia Profile Inspector\nvidiaProfileInspector.zip" -O"%USERPROFILE%\Documents\_Tools\Nvidia Profile Inspector" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\Nvidia Profile Inspector\nvidiaProfileInspector.zip" >nul 2>&1
 )
 if "!Nvlddmkm Patcher!"=="[40;95m[[40;33mx[40;95m][40;37m Nvlddmkm Patcher" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://www.monitortests.com/download/nvlddmkm-patcher/nvlddmkm-patcher-1.4.12.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\nvlddmkm-patcher.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\nvlddmkm-patcher.zip" -O"%USERPROFILE%\Documents\_Tools\" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\nvlddmkm-patcher.zip" >nul 2>&1
 )
 if "!Custom Resolution Utility!"=="[40;95m[[40;33mx[40;95m][40;37m Custom Resolution Utility" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://www.monitortests.com/download/cru/cru-1.4.2.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\Custom Resolution Utility\cru.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\Custom Resolution Utility\cru.zip" -O"%USERPROFILE%\Documents\_Tools\Custom Resolution Utility" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\Custom Resolution Utility\cru.zip" >nul 2>&1
 )
 if "!SweetLow Mouse Rate Changer!"=="[40;95m[[40;33mx[40;95m][40;37m SweetLow Mouse Rate Changer" (
-    set "OPENTOOLS=true"
+    set "OPENTOOLS=True"
     call :CURL -L --progress-bar "https://raw.githubusercontent.com/LordOfMice/hidusbf/master/hidusbf.zip" --create-dirs -o "%USERPROFILE%\Documents\_Tools\SweetLow Mouse Rate Changer\hidusbf.zip"
     call "modules\7z.exe" x -aoa "%USERPROFILE%\Documents\_Tools\SweetLow Mouse Rate Changer\hidusbf.zip" -O"%USERPROFILE%\Documents\_Tools\SweetLow Mouse Rate Changer" >nul 2>&1
     del /f /q "%USERPROFILE%\Documents\_Tools\SweetLow Mouse Rate Changer\hidusbf.zip" >nul 2>&1
 )
-if "!OPENTOOLS!"=="true" (
+if "!OPENTOOLS!"=="True" (
     start "" "explorer.exe" "%USERPROFILE%\Documents\_Tools\"
 )
 goto TOOLS_MENU_CLEAR
@@ -1192,14 +1485,22 @@ goto MAIN_MENU
 ::      :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::      ::::::::::::::::::::::::::::::::     FONCTIONS     ::::::::::::::::::::::::::::::::
 ::      :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:SETVARIABLE
+:SETVARIABLES
 :: Check SSD
-for /f %%i in ('call "modules\smartctl.exe" --scan') do call "modules\smartctl.exe" %%i -a | findstr /i "Solid SSD RAID SandForce" >nul 2>&1 && set "SSD=yes"
+for /f %%i in ('call "modules\smartctl.exe" --scan') do call "modules\smartctl.exe" %%i -a | findstr /i "Solid SSD RAID SandForce" >nul 2>&1 && ( set "SSD=True" ) || ( set "SSD=False" )
 :: Check Laptop
-for /f "tokens=*" %%A IN ('WMIC Path Win32_Battery Get BatteryStatus 2^>^&1 /Format:List ^| FIND "="') DO if %%A neq 0 set "LAPTOP=yes"
+wmic path Win32_Battery get BatteryStatus | findstr "BatteryStatus" >nul 2>&1 && ( set "LAPTOP=True" ) || ( set "LAPTOP=False" )
+:: Check GPU
+wmic path Win32_VideoController get Name | findstr "NVIDIA" >nul 2>&1 && set "GPU=NVIDIA"
+wmic path Win32_VideoController get Name | findstr "AMD ATI Radeon" >nul 2>&1 && set "GPU=AMD"
+:: Monitor number
+for /f "delims=DesktopMonitor, " %%i in ('wmic path Win32_DesktopMonitor get DeviceID^| findstr /l "DesktopMonitor"') do set MonitorAmount=%%i
+:: Page file
+for /f "tokens=*" %%i in ('wmic os get TotalVisibleMemorySize^| findstr [1-9]') do set SYSTEMRAM=%%i
+set /a PAGEFILE=(!SYSTEMRAM!*2)
 :: Service token
-for /F "SKIP=2" %%a in ('reg query "HKLM\System\CurrentControlSet\Services" /f "cdpusersvc"^| findstr /v /c:"End of search:"') DO (
-    set SERVICE=%%a
+for /f "tokens=*" %%i in ('reg query "HKLM\System\CurrentControlSet\Services" /f "cdpusersvc_"^| findstr "HKEY"') do (
+    set SERVICE=%%i
     set SERVICE=!SERVICE:HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\cdpusersvc_=!
 )
 goto :eof
@@ -1213,7 +1514,7 @@ choco install %* -y --limit-output --ignore-checksums
 goto :eof
 
 :CURL
-if not exist "%systemroot%\System32\curl.exe" (
+if not exist "%windir%\System32\curl.exe" (
     if not exist "%PROGRAMDATA%\chocolatey\lib\curl" call :CHOCO curl
 )
 curl %*
