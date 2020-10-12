@@ -27,7 +27,6 @@ If you're a developer or just a software user you can help the project by:
 * [Opening an issue](https://github.com/ArtanisInc/Post-Tweaks/issues) to report any bugs you experience (please see if an issue already exists before opening an issue)
 * Trying to find where the problem lies with a particular issue (regardless of your skill level, information is always helpful)
 * Fixing issues, if you spot an [issue](https://github.com/ArtanisInc/Post-Tweaks/issues) you think you can fix, please make a fork and submit a pull request that solves the issue. Any contributions are welcome!
-  * Right now we don't have a very fixed code styling due to the amount of inconsistency in the project. At some point I'm going to go through and make it all consistent, but it'll probably be CamelCase or a slight variation of it that'll be used.
   
 ## License
 Post Tweaks is licensed under the [Creative Commons : CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) license. For more details, see the [LICENSE](LICENSE.md).
