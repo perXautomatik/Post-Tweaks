@@ -12,7 +12,7 @@
 Post Tweaks aims to improve the responsiveness, performance and privacy of Windows. It also allows automatic installation of programs in the background.
 
 ## Disclaimer
-Please, do not use Post Tweaks if you do not know what it does. The author takes no responsibility for any loss or damage of any kind.
+Please, do not use Post Tweaks if you do not know what it does. The author takes no responsibility for any loss or damage of any kind.<br />
 Also note that this project is not finished yet so except bug.
 
 ## Prerequisites
