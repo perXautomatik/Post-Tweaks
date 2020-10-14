@@ -1621,7 +1621,7 @@ if "!ImageGlass!"=="[40;95m[[40;33mx[40;95m][40;37m ImageGlass" call :CHOCO 
 if "!ShareX!"=="[40;95m[[40;33mx[40;95m][40;37m ShareX" call :CHOCO sharex
 if "!GIMP!"=="[40;95m[[40;33mx[40;95m][40;37m GIMP" call :CHOCO gimp
 :: MESSAGING
-if "!Discord!"=="[40;95m[[40;33mx[40;95m][40;37m Discord" call :CHOCO discord.install
+if "!Discord!"=="[40;95m[[40;33mx[40;95m][40;37m Discord" call :CHOCO discord
 if "!Ripcord!"=="[40;95m[[40;33mx[40;95m][40;37m Ripcord" call :CHOCO ripcord & call :SHORTCUT "Ripcord" "%UserProfile%\desktop" "%ProgramData%\chocolatey\lib\ripcord\tools\Ripcord.exe" "%ProgramData%\chocolatey\lib\ripcord\tools"
 if "!TeamSpeak!"=="[40;95m[[40;33mx[40;95m][40;37m TeamSpeak" call :CHOCO teamspeak
 :: DOCUMENTS
