@@ -1,6 +1,6 @@
-@echo off &setlocal enableextensions enabledelayedexpansion
+@echo off
+setlocal enabledelayedexpansion
 mode con lines=20 cols=125
-mode con rate=32 delay=0
 cd /d "%~dp0"
 chcp 65001 >nul 2>&1
 
