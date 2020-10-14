@@ -19,9 +19,6 @@ if !ERRORLEVEL! neq 0 (
     pause >nul && exit
 )
 
-whoami /user | find /i "S-1-5-18" >nul 2>&1
-if !ERRORLEVEL! neq 0 call "modules\nsudo.exe" -U:T -P:E -UseCurrentConsole "%~dpnx0" && exit
-
 ping -n 1 "google.com" >nul 2>&1
 if !ERRORLEVEL! neq 0 (
     echo [40;31mERROR: [40;90mNo internet connection found
@@ -39,11 +36,10 @@ for %%i in (!NEEDEDFILES!) do (
     )
 )
 if "!MISSINGFILES!"=="True" echo Downloading missing files please wait...[40;33m
-for %%i in (!NEEDEDFILES!) do (
-    if not exist %%i (
-        call :CURL -L --progress-bar "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/main/%%i" --create-dirs -o "%%i"
-    )
-)
+for %%i in (!NEEDEDFILES!) do if not exist %%i call :CURL -L --progress-bar "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/main/%%i" --create-dirs -o "%%i"
+
+whoami /user | find /i "S-1-5-18" >nul 2>&1
+if !ERRORLEVEL! neq 0 call "modules\nsudo.exe" -U:T -P:E -UseCurrentConsole "%~dpnx0" && exit
 
 set NVERSION=0
 set NVERSION_INFO=0
@@ -823,7 +819,7 @@ for %%i IN (BITS BrokerInfrastructure BFE EventSystem CDPSvc CDPUserSvc_!SERVICE
     CryptSvc DusmSvc DcomLaunch Dhcp Dnscache gpsvc LSM NlaSvc nsi Power PcaSvc RpcSs
     RpcEptMapper SamSs ShellHWDetection sppsvc SysMain OneSyncSvc_!SERVICE! SENS
     SystemEventsBroker Schedule Themes UserManager ProfSvc AudioSrv AudioEndpointBuilder Wcmsvc WinDefend
-    MpsSvc SecurityHealthService EventLog FontCache Winmgmt WpnService WSearch LanmanWorkstation) DO (
+    MpsSvc SecurityHealthService EventLog FontCache Winmgmt WpnService WSearch LanmanWorkstation) do (
     reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
     if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
 )
@@ -1914,7 +1910,7 @@ goto TOOLS_MENU_CLEAR
 
 
 :CREDITS
-call :MSGBOX "TheBATeam community - Coding help.\nRevision community - Learned a lot about PC Tweaking.\nMelody - For his tweaks guides and scripts.\nDanske - For his Windows Tweak guide.\nRiot - For his 'Hit-Reg and Network Latency' guide.\nFelip - Codes from his 'Tweaks for Gaming'.\nIBUZZARDl - Coding help.\n\nThanks to many other people for help with testing and suggestions \n                                                              Created by Artanis \n                                                      Copyright Artanis 2020" vbInformation "Credits"
+call :MSGBOX "TheBATeam community - Coding help.\nRevision community - Learned a lot about PC Tweaking.\nMelody - For her tweaks guides and scripts.\nDanske - For his Windows Tweak guide.\nRiot - For his 'Hit-Reg and Network Latency' guide.\nFelip - Codes from his 'Tweaks for Gaming'.\nIBUZZARDl - Coding help.\n\nThanks to many other people for help with testing and suggestions \n                                                              Created by Artanis \n                                                      Copyright Artanis 2020" vbInformation "Credits"
 goto MAIN_MENU
 
 :HELP
