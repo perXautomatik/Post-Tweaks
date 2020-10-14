@@ -695,8 +695,8 @@ for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl
 
 :: Enable MSI mode & Remove DevicePriority
 for /f %%i in ('wmic path Win32_PnPEntity get DeviceID^| findstr /l "VEN_"') do (
-	for /f "tokens=*" %%j in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /s /f "MessageSignaledInterruptProperties"^| findstr /e "MessageSignaledInterruptProperties"') do reg add "%%j" /v "MSISupported" /t REG_DWORD /d "1" /f >nul 2>&1
-	for /f "tokens=*" %%j in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /s /f "Affinity Policy"^| findstr /e "Affinity Policy"') do reg delete "%%j" /v "DevicePriority" /f >nul 2>&1
+    for /f "tokens=*" %%j in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /s /f "MessageSignaledInterruptProperties"^| findstr /e "MessageSignaledInterruptProperties"') do reg add "%%j" /v "MSISupported" /t REG_DWORD /d "1" /f >nul 2>&1
+    for /f "tokens=*" %%j in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum\%%i" /s /f "Affinity Policy"^| findstr /e "Affinity Policy"') do reg delete "%%j" /v "DevicePriority" /f >nul 2>&1
 )
 for /f %%i in ('wmic path win32_VideoController get DeviceID ^| findstr /l "VEN_"') do reg add "HKLM\SYSTEM\CurrentControlSet\Enum\%%i\Device Parameters\Interrupt Management\MessageSignaledInterruptProperties" /v "MSISupported" /t REG_DWORD /d "1" /f >nul 2>&1
 
@@ -713,32 +713,32 @@ wmic pagefileset where name="C:\\pagefile.sys" set InitialSize=!PAGEFILE!,Maximu
 :: Text Improvements
 reg query "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /f >nul 2>&1
 if !ERRORLEVEL! equ 0 (
-	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "GrayscaleEnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "PixelStructure" /t REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "TextContrastLevel" /t REG_DWORD /d "6" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "GrayscaleEnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "PixelStructure" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "TextContrastLevel" /t REG_DWORD /d "6" /f >nul 2>&1
 )
 
 reg query "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /f >nul 2>&1
 if !ERRORLEVEL! equ 0 (
-	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "GrayscaleEnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "PixelStructure" /t REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "TextContrastLevel" /t REG_DWORD /d "6" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "GrayscaleEnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "PixelStructure" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "TextContrastLevel" /t REG_DWORD /d "6" /f >nul 2>&1
 )
 
 reg query "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /f >nul 2>&1
 if !ERRORLEVEL! equ 0 (
-	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
-	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
-	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "GrayscaleEnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "PixelStructure" /t REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "TextContrastLevel" /t REG_DWORD /d "6" /f >nul 2>&1
+    reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
+    reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
+    reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "GrayscaleEnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "PixelStructure" /t REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "TextContrastLevel" /t REG_DWORD /d "6" /f >nul 2>&1
 )
 
 :: Laptop
@@ -754,28 +754,28 @@ if "!SSD!"=="True" (
 :: Nvidia specific
 if "!GPU!"=="NVIDIA" (
     ::Low Latency
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "UseGpuTimer" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmGpsPsEnablePerCpuCoreDpc" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PowerSavingTweaks" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisableWriteCombining" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "EnableRuntimePowerManagement" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PrimaryPushBufferSize" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "FlTransitionLatency" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "D3PCLatency" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RMDeepLlEntryLatencyUsec" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PciLatencyTimerControl" /T REG_DWORD /d "32" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "Node3DLowLatency" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "LOWLATENCY" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmDisableRegistryCaching" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RMDisablePostL2Compression" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmFbsrPagedDMA" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "AdaptiveVsyncEnable" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "AllowDeepCStates" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisableGDIAcceleration" /T REG_DWORD /d "0" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisablePFonDP" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "Disable_OverlayDSQualityEnhancement" /T REG_DWORD /d "1" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "BuffersInFlight" /T REG_DWORD /d "128" /f >nul 2>&1
-	reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v Display"!MonitorAmount!"_PipeOptimizationEnable /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "UseGpuTimer" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmGpsPsEnablePerCpuCoreDpc" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PowerSavingTweaks" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisableWriteCombining" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "EnableRuntimePowerManagement" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PrimaryPushBufferSize" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "FlTransitionLatency" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "D3PCLatency" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RMDeepLlEntryLatencyUsec" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "PciLatencyTimerControl" /T REG_DWORD /d "32" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "Node3DLowLatency" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "LOWLATENCY" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmDisableRegistryCaching" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RMDisablePostL2Compression" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "RmFbsrPagedDMA" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "AdaptiveVsyncEnable" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "AllowDeepCStates" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisableGDIAcceleration" /T REG_DWORD /d "0" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "DisablePFonDP" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "Disable_OverlayDSQualityEnhancement" /T REG_DWORD /d "1" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v "BuffersInFlight" /T REG_DWORD /d "128" /f >nul 2>&1
+    reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm" /v Display"!MonitorAmount!"_PipeOptimizationEnable /T REG_DWORD /d "1" /f >nul 2>&1
     :: silk smooth
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\nvlddmkm\FTS" /v "EnableRID61684" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000" /v "PreferSystemMemoryContiguous" /t REG_DWORD /d "1" /f >nul 2>&1
@@ -820,39 +820,39 @@ if "!GPU!"=="AMD" (
 
 :: Services
 for %%i IN (BITS BrokerInfrastructure BFE EventSystem CDPSvc CDPUserSvc_!SERVICE! CoreMessagingRegistrar
-	CryptSvc DusmSvc DcomLaunch Dhcp Dnscache gpsvc LSM NlaSvc nsi Power PcaSvc RpcSs
-	RpcEptMapper SamSs ShellHWDetection sppsvc SysMain OneSyncSvc_!SERVICE! SENS
-	SystemEventsBroker Schedule Themes UserManager ProfSvc AudioSrv AudioEndpointBuilder Wcmsvc WinDefend
-	MpsSvc SecurityHealthService EventLog FontCache Winmgmt WpnService WSearch LanmanWorkstation) DO (
-	reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
+    CryptSvc DusmSvc DcomLaunch Dhcp Dnscache gpsvc LSM NlaSvc nsi Power PcaSvc RpcSs
+    RpcEptMapper SamSs ShellHWDetection sppsvc SysMain OneSyncSvc_!SERVICE! SENS
+    SystemEventsBroker Schedule Themes UserManager ProfSvc AudioSrv AudioEndpointBuilder Wcmsvc WinDefend
+    MpsSvc SecurityHealthService EventLog FontCache Winmgmt WpnService WSearch LanmanWorkstation) DO (
+    reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
     if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
 )
 for %%i IN (AxInstSV AppReadiness AppIDSvc Appinfo AppXSVC BDESVC wbengine camsvc ClipSVC KeyIso
-	COMSysApp Browser PimIndexMaintenanceSvc_!SERVICE! VaultSvc DsSvc DeviceAssociationService
-	DeviceInstall DmEnrollmentSvc DsmSVC DevicesFlowUserSvc_!SERVICE! DevQueryBroker diagsvc
-	WdiSystemHost MSDTC embeddedmode EFS EntAppSvc EapHost fhsvc fdPHost FDResPub GraphicsPerfSvc
-	hidserv IKEEXT UI0Detect PolicyAgent KtmRm lltdsvc wlpasvc MessagingService_!SERVICE! wlidsvc
-	NgcSvc NgcCtnrSvc swprv smphost Netman NcaSVC netprofm NetSetupSvc defragsvc PNRPsvc p2psvc
-	p2pimsvc PerfHost pla PlugPlay PNRPAutoReg WPDBusEnum PrintNotify PrintWorkflowUserSvc_!SERVICE!
-	wercplsupport QWAVE RmSvc RasAuto RasMan seclogon SstpSvc SharedRealitySvc svsvc SSDPSRV
-	StateRepository WiaRpc StorSvc TieringEngineService lmhosts TapiSrv tiledatamodelsvc TimeBroker
-	UsoSvc upnphost UserDataSvc_!SERVICE! UnistoreSvc_!SERVICE! vds VSS WalletService TokenBroker
-	SDRSVC Sense WdNisSvc WEPHOSTSVC WerSvc Wecsvc StiSvc msiserver LicenseManager TrustedInstaller
-	spectrum WpnUserService_!SERVICE! InstallService W32Time wuauserv WinHttpAutoProxySvc dot3svc
-	WlanSvc wmiApSrv XboxGipSvc) do (
-	reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
-	if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
+    COMSysApp Browser PimIndexMaintenanceSvc_!SERVICE! VaultSvc DsSvc DeviceAssociationService
+    DeviceInstall DmEnrollmentSvc DsmSVC DevicesFlowUserSvc_!SERVICE! DevQueryBroker diagsvc
+    WdiSystemHost MSDTC embeddedmode EFS EntAppSvc EapHost fhsvc fdPHost FDResPub GraphicsPerfSvc
+    hidserv IKEEXT UI0Detect PolicyAgent KtmRm lltdsvc wlpasvc MessagingService_!SERVICE! wlidsvc
+    NgcSvc NgcCtnrSvc swprv smphost Netman NcaSVC netprofm NetSetupSvc defragsvc PNRPsvc p2psvc
+    p2pimsvc PerfHost pla PlugPlay PNRPAutoReg WPDBusEnum PrintNotify PrintWorkflowUserSvc_!SERVICE!
+    wercplsupport QWAVE RmSvc RasAuto RasMan seclogon SstpSvc SharedRealitySvc svsvc SSDPSRV
+    StateRepository WiaRpc StorSvc TieringEngineService lmhosts TapiSrv tiledatamodelsvc TimeBroker
+    UsoSvc upnphost UserDataSvc_!SERVICE! UnistoreSvc_!SERVICE! vds VSS WalletService TokenBroker
+    SDRSVC Sense WdNisSvc WEPHOSTSVC WerSvc Wecsvc StiSvc msiserver LicenseManager TrustedInstaller
+    spectrum WpnUserService_!SERVICE! InstallService W32Time wuauserv WinHttpAutoProxySvc dot3svc
+    WlanSvc wmiApSrv XboxGipSvc) do (
+    reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
+    if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
 )
 for %%i in (AJRouter ALG AppMgmt tzautoupdate BthHFSrv bthserv PeerDistSvc CertPropSvc NfsClnt
-	MapsBroker lfsvc HvHost vmickvpexchange vmicguestinterface vmicshutdown vmicheartbeat
-	vmicvmsession vmicrdv vmictimesync vmicvss irmon SharedAccess iphlpsvc IpxlatCfgSvc AppVClient
-	MSiSCSI SmsRouter NaturalAuthentication Netlogon NcdAutoSetup CscService SEMgrSvc PhoneSvc
-	SessionEnv TermService UmRdpService RpcLocator RemoteRegistry RetailDemo RemoteAccess SensorDataService
-	SensrSvc SensorService shpamsvc SCardSvr ScDeviceEnum SCPolicySvc SNMPTRAP TabletInputService
-	UevAgentService WebClient WFDSConSvc FrameServer wcncsvc wisvc WMPNetworkSvc icssvc WinRM WwanSvc
-	xbgm XblAuthManager XblGameSave XboxNetApiSvc diagnosticshub.standardcollector.service DiagTrack
-	DoSvc DPS WdiServiceHost HomeGroupListener HomeGroupProvider NetTcpPortSharing TrkWks WbioSrvc
-	wscsvc NcbService Spooler LanmanServer dmwappushservice) do (
+    MapsBroker lfsvc HvHost vmickvpexchange vmicguestinterface vmicshutdown vmicheartbeat
+    vmicvmsession vmicrdv vmictimesync vmicvss irmon SharedAccess iphlpsvc IpxlatCfgSvc AppVClient
+    MSiSCSI SmsRouter NaturalAuthentication Netlogon NcdAutoSetup CscService SEMgrSvc PhoneSvc
+    SessionEnv TermService UmRdpService RpcLocator RemoteRegistry RetailDemo RemoteAccess SensorDataService
+    SensrSvc SensorService shpamsvc SCardSvr ScDeviceEnum SCPolicySvc SNMPTRAP TabletInputService
+    UevAgentService WebClient WFDSConSvc FrameServer wcncsvc wisvc WMPNetworkSvc icssvc WinRM WwanSvc
+    xbgm XblAuthManager XblGameSave XboxNetApiSvc diagnosticshub.standardcollector.service DiagTrack
+    DoSvc DPS WdiServiceHost HomeGroupListener HomeGroupProvider NetTcpPortSharing TrkWks WbioSrvc
+    wscsvc NcbService Spooler LanmanServer dmwappushservice) do (
     reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
     if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
@@ -1948,8 +1948,8 @@ goto :eof
 
 :CHOCO [Package]
 if not exist "%ProgramData%\chocolatey" (
-	powershell -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && set "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
-	call "%ProgramData%\chocolatey\bin\RefreshEnv.cmd"
+    powershell -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && set "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
+    call "%ProgramData%\chocolatey\bin\RefreshEnv.cmd"
 )
 choco install %* -y --limit-output --ignore-checksums
 goto :eof
