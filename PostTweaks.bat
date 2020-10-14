@@ -9,7 +9,7 @@ set VERSION_INFO=31/10/2020
 title Post Tweaks
 
 openfiles >nul 2>&1
-if %ERRORLEVEL% neq 0 (
+if !ERRORLEVEL! neq 0 (
     echo [40;90mYou are not running as [40;31mAdministrator[40;90m...
     echo This batch cannot do it's job without elevation!
     echo.
@@ -20,10 +20,10 @@ if %ERRORLEVEL% neq 0 (
 )
 
 whoami /user | find /i "S-1-5-18" >nul 2>&1
-if %ERRORLEVEL% neq 0 call "modules\nsudo.exe" -U:T -P:E -UseCurrentConsole "%~dpnx0" && exit
+if !ERRORLEVEL! neq 0 call "modules\nsudo.exe" -U:T -P:E -UseCurrentConsole "%~dpnx0" && exit
 
 ping -n 1 "google.com" >nul 2>&1
-if %ERRORLEVEL% neq 0 (
+if !ERRORLEVEL! neq 0 (
     echo [40;31mERROR: [40;90mNo internet connection found
     echo.
     echo Please make sure you are connected to the internet and try again . . .
@@ -49,7 +49,7 @@ set NVERSION=0
 set NVERSION_INFO=0
 
 call :CURL --silent "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/main/version.txt" --create-dirs -o "version.txt"
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     for /f "tokens=1 delims= " %%i in (version.txt) do set NVERSION=%%i
     for /f "tokens=1,2 delims= " %%i in (version.txt) do set NVERSION_INFO=%%j
 )
@@ -61,12 +61,12 @@ if /i !VERSION! lss !NVERSION! (
     echo    Current version:   [40;33m!VERSION![40;90m - [40;33m!VERSION_INFO![40;90m
     echo    Latest version:    [40;33m!NVERSION![40;90m - [40;33m!NVERSION_INFO![40;90m
     echo.
-    echo Auto-download latest version now? [[40;33mYes[40;90m^/[40;33mNo[40;90m]
+    echo Auto-download latest version now? [[40;33mYes[40;90m^/[40;33mNo[40;90m][40;33m
     choice /c yn /n /m "" /t 25 /d y
-    if %ERRORLEVEL% equ 1 (
+    if !ERRORLEVEL! equ 1 (
         cls
         echo.
-        echo Updating to the latest version, please wait...[40;33m
+        echo Updating to the latest version, please wait...
         echo.
         call :CURL -L --progress-bar "https://github.com/ArtanisInc/Post-Tweaks/archive/main.zip" --create-dirs -o "main.zip"
         call "modules\7z.exe" x -aoa "main.zip" >nul 2>&1
@@ -126,7 +126,7 @@ goto MAIN_MENU
 call :SETVARIABLES >nul 2>&1
 
 call :MSGBOX "Do you want to create a registry backup and a restore point ?" vbYesNo+vbQuestion "System Restore"
-if %ERRORLEVEL% equ 6 (
+if !ERRORLEVEL! equ 6 (
     wmic /namespace:\\root\default path systemrestore call createrestorepoint "Post Tweaks", 100, 12 >nul 2>&1
     regedit /e "%UserProfile%\desktop\Registry Backup.reg" >nul 2>&1
 )
@@ -712,7 +712,7 @@ wmic pagefileset where name="C:\\pagefile.sys" set InitialSize=!PAGEFILE!,Maximu
 
 :: Text Improvements
 reg query "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /f >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
 	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
 	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
 	reg add "HKLM\SOFTWARE\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
@@ -722,7 +722,7 @@ if %ERRORLEVEL% equ 0 (
 )
 
 reg query "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /f >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
 	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
 	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
 	reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
@@ -732,7 +732,7 @@ if %ERRORLEVEL% equ 0 (
 )
 
 reg query "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /f >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
 	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "ClearTypeLevel" /t REG_DWORD /d "100" /f >nul 2>&1
 	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "EnhancedContrastLevel" /t REG_DWORD /d "0" /f >nul 2>&1
 	reg add "HKCU\SOFTWARE\Microsoft\Avalon.Graphics" /v "GammaLevel" /t REG_DWORD /d "1600" /f >nul 2>&1
@@ -825,7 +825,7 @@ for %%i IN (BITS BrokerInfrastructure BFE EventSystem CDPSvc CDPUserSvc_!SERVICE
 	SystemEventsBroker Schedule Themes UserManager ProfSvc AudioSrv AudioEndpointBuilder Wcmsvc WinDefend
 	MpsSvc SecurityHealthService EventLog FontCache Winmgmt WpnService WSearch LanmanWorkstation) DO (
 	reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
-    if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
+    if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "2" /f >nul 2>&1
 )
 for %%i IN (AxInstSV AppReadiness AppIDSvc Appinfo AppXSVC BDESVC wbengine camsvc ClipSVC KeyIso
 	COMSysApp Browser PimIndexMaintenanceSvc_!SERVICE! VaultSvc DsSvc DeviceAssociationService
@@ -841,7 +841,7 @@ for %%i IN (AxInstSV AppReadiness AppIDSvc Appinfo AppXSVC BDESVC wbengine camsv
 	spectrum WpnUserService_!SERVICE! InstallService W32Time wuauserv WinHttpAutoProxySvc dot3svc
 	WlanSvc wmiApSrv XboxGipSvc) do (
 	reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
-	if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
+	if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "3" /f >nul 2>&1
 )
 for %%i in (AJRouter ALG AppMgmt tzautoupdate BthHFSrv bthserv PeerDistSvc CertPropSvc NfsClnt
 	MapsBroker lfsvc HvHost vmickvpexchange vmicguestinterface vmicshutdown vmicheartbeat
@@ -854,12 +854,12 @@ for %%i in (AJRouter ALG AppMgmt tzautoupdate BthHFSrv bthserv PeerDistSvc CertP
 	DoSvc DPS WdiServiceHost HomeGroupListener HomeGroupProvider NetTcpPortSharing TrkWks WbioSrvc
 	wscsvc NcbService Spooler LanmanServer dmwappushservice) do (
     reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
-    if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+    if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 
 call "modules\choicebox.exe" "Disable Windows Search; Disable OneDrive; Disable Windows Store; Disable Xbox Apps; Disable Wi-Fi; Disable Bluetooth; Disable Printer; Disable Hyper-V; Disable Remote Desktop; Disable Task Scheduler; Disable Compatibility Assistant; Disable Disk Management; Disable Windows Update; Disable Windows Defender; Disable Windows Firewall" " " "Services" /C:2 >"%TMP%\services.txt"
 findstr /c:"Disable Windows Search" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\wsearch" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\TabletInputService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\Windows Search" /v "AllowCortana" /t REG_DWORD /d "0" /f >nul 2>&1
@@ -890,7 +890,7 @@ if %ERRORLEVEL% equ 0 (
     )
 )
 findstr /c:"Disable OneDrive" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     taskkill /f /im OneDrive.exe >nul 2>&1
     if exist "%WinDir%\System32\OneDriveSetup.exe" start /wait "%WinDir%\System32\OneDriveSetup.exe" /uninstall >nul 2>&1
     rd "%UserProfile%\OneDrive" /q /s >nul 2>&1
@@ -906,7 +906,7 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKCU\SOFTWARE\Microsoft\OneDrive" /v "DisablePersonalSync" /t REG_DWORD /d "1" /f >nul 2>&1
 )
 findstr /c:"Disable Windows Store" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\iphlpsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\ClipSVC" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\AppXSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -930,7 +930,7 @@ if %ERRORLEVEL% equ 0 (
     for /d %%i in ("\Program Files\WindowsApps\*Store*") do set rd /s /q "%%~nxi" >nul 2>&1
 )
 findstr /c:"Disable Xbox Apps" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\XboxNetApiSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\XblGameSave" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\XblAuthManager" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -941,7 +941,7 @@ if %ERRORLEVEL% equ 0 (
     rd /s /q "%WinDir%\SystemApps\Microsoft.XboxGameCallableUI_cw5n1h2txyewy" >nul 2>&1
 )
 findstr /c:"Disable Wi-Fi" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\WwanSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\WlanSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\wcncsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -950,7 +950,7 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\vwifibus" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Bluetooth" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\BTAGService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\bthserv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\BthAvctpSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -958,7 +958,7 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\BluetoothUserService" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Printer" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\Fax" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\Spooler" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -966,7 +966,7 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\PrintWorkflowUserSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Hyper-V" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\HvHost" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\vmickvpexchange" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\vmicguestinterface" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -978,7 +978,7 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\vmicvss" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Remote Desktop" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\RasAuto" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\RasMan" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\SessionEnv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -988,24 +988,24 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\RpcLocator" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Task Scheduler" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\Schedule" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\TimeBrokerSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Compatibility Assistant" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "AITEnable" /t REG_DWORD /d "0" /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisablePCA" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\AppCompat" /v "DisableUAR" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\PcaSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Disk Management" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\defragsvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\vds" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Windows Update" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\wuauserv" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\WaaSMedicSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\PeerDistSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -1036,7 +1036,7 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SOFTWARE\Microsoft\WindowsUpdate\UX\Settings" /v "ExcludeWUDriversInQualityUpdate" /t REG_DWORD /d "1" /f >nul 2>&1
 )
 findstr /c:"Disable Windows Defender" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\Sense" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\WdNisSvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\WinDefend" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -1062,7 +1062,7 @@ if %ERRORLEVEL% equ 0 (
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\Wdnsfltr" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 findstr /c:"Disable Windows Firewall" "%TMP%\services.txt" >nul 2>&1
-if %ERRORLEVEL% equ 0 (
+if !ERRORLEVEL! equ 0 (
     netsh advfirewall set allprofiles state off >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\mpssvc" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
     reg add "HKLM\SYSTEM\CurrentControlSet\Services\BFE" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
@@ -1097,7 +1097,7 @@ for %%i in (AcpiDev CAD CldFlt FileCrypt GpuEnergyDrv PptpMiniport RapiMgr RasAg
     RasAcd RasPppoe rdbss rdpbus rdyboost rspndr spaceport srv2 Srvnet TapiSrv Tcpip6
     tcpipreg tdx TPM umbus vdrvroot Vid Volmgrx WmiAcpi ws2ifsl) do (
     reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
-    if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
+    if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
 
 :: Network
@@ -1259,7 +1259,7 @@ if "!CPU!"=="RYZEN" (
 
 :: Remove Windows apps
 call :MSGBOX "Would you like to strip Windows bloatware ?" vbYesNo+vbQuestion "Bloatware"
-if %ERRORLEVEL% equ 6 (
+if !ERRORLEVEL! equ 6 (
     taskkill /f /im ShellExperienceHost.exe >nul 2>&1
     taskkill /f /im StartMenuExperienceHost.exe >nul 2>&1
     taskkill /f /im MicrosoftEdge.exe >nul 2>&1
@@ -1303,7 +1303,7 @@ for %%i in (AutoLogger-Diagtrack-Listener AppModel Cellcore CloudExperienceHostO
     SpoolerLogger SQMLogger TCPIPLOGGER TileStore Tpm TPMProvisioningService UBPM WdiContextLog
     WFP-IPsec Trace WiFiDriverIHVSession WiFiDriverIHVSessionRepro WiFiSession WinPhoneCritical) do (
     reg query "HKLM\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\%%i" /ve >nul 2>&1
-    if %ERRORLEVEL% equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\%%i" /v "Start" /t REG_DWORD /d "0" /f >nul 2>&1
+    if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\%%i" /v "Start" /t REG_DWORD /d "0" /f >nul 2>&1
 )
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\Circular Kernel Context Logger" /v "Start" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WUDF" /v "LogEnable" /t REG_DWORD /d "0" /f >nul 2>&1
@@ -1381,7 +1381,7 @@ start "" "explorer.exe" >nul 2>&1
 
 :: Reboot
 call :MSGBOX "Some registry changes may require a reboot to take effect.\n\nWould you like to restart now?" vbYesNo+vbQuestion "Shut Down Windows"
-if %ERRORLEVEL% equ 6 shutdown -r -f -t 0
+if !ERRORLEVEL! equ 6 shutdown -r -f -t 0
 timeout /t 1 /nobreak >nul 2>&1
 goto MAIN_MENU
 
@@ -1964,7 +1964,7 @@ goto :eof
 :MSGBOX [Text] [Argument] [Title]
 echo WScript.Quit Msgbox(Replace("%~1","\n",vbCrLf),%~2,"%~3") > "%TMP%\msgbox.vbs"
 cscript /nologo "%TMP%\msgbox.vbs"
-set "exitCode=%errorlevel%" & del /f /q "%TMP%\msgbox.vbs"
+set "exitCode=!ERRORLEVEL!" & del /f /q "%TMP%\msgbox.vbs"
 exit /b %exitCode%
 
 :SHORTCUT [Name] [Path] [TargetPath] [WorkingDirectory]
