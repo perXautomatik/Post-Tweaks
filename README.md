@@ -23,7 +23,11 @@ Also note that this project is not finished yet so expect bugs.
 Get the latest version [here](https://github.com/ArtanisInc/Post-Tweaks/releases/download/v1.0/PostTweaks.zip)
 
 ## Contributing
-Feel free to [Open an issue](https://github.com/ArtanisInc/Post-Tweaks/issues) or [submit Pull Requests](https://github.com/ArtanisInc/Post-Tweaks/pulls).
+If you're a developer or just a software user you can help the project by:
+
+* [Opening an issue](https://github.com/ArtanisInc/Post-Tweaks/issues) to report any bugs you experience (please see if an issue already exists before opening an issue)
+* Trying to find where the problem lies with a particular issue (regardless of your skill level, information is always helpful)
+* Fixing issues, if you spot an [issue](https://github.com/ArtanisInc/Post-Tweaks/issues) you think you can fix, please make a fork and submit a [Pull Requests](https://github.com/ArtanisInc/Post-Tweaks/pulls) that solves the issue. Any contributions are welcome!
   
 ## License
 Post Tweaks is licensed under the [Creative Commons : CC-BY-NC](https://creativecommons.org/licenses/by-nc/4.0/) license. For more details, see the [LICENSE](LICENSE.md).
