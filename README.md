@@ -1,16 +1,15 @@
-<div align="center"><img src="https://cdn.discordapp.com/attachments/595370063104573511/761281873979768872/demo.gif">
-<h1>Post Tweaks</h1>
+<div align="center"><h1>Post Tweaks</h1>
 <h3>A post-installation batch script for Windows<h3>
+<img src="https://cdn.discordapp.com/attachments/595370063104573511/761281873979768872/demo.gif">
 </div><br/>
 
 <div align="center">
-<a href="#Overview">Overview</a> &#8226; <a href="#Disclaimer">Disclaimer</a> &#8226; <a href="#Requirements">Requirements</a> &#8226; <a href="#Download">Download</a> &#8226; <a href="#Contributing">Contributing</a> &#8226; <a href="#License">License</a></br>
+<a href="#About">About</a> &#8226; <a href="#Disclaimer">Disclaimer</a> &#8226; <a href="#Requirements">Requirements</a> &#8226; <a href="#Download">Download</a> &#8226; <a href="#Contributing">Contributing</a> &#8226; <a href="#License">License</a></br>
 </div>
 <hr>
 
-## Overview
-<tbody><tr>
-<td>Post Tweaks aims to improve the responsiveness, performance and privacy of Windows. It also allows automatic installation of useful programs in the background.
+## About
+Post Tweaks aims to improve the responsiveness, performance and privacy of Windows. It also allows automatic installation of useful programs in the background.
 
 ## Disclaimer
 >Post Tweaks is provided "AS IS" without any warranty. In no event will the author be liable for any special, incidental, consequential or indirect damages due to loss of data or any other reason.
