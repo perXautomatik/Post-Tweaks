@@ -568,7 +568,7 @@ echo GPU scheduling
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchedMode" /t REG_DWORD /d "2" /f >nul 2>&1
 
 echo Display tweaks
-for /f "delims=DesktopMonitor, " %%i in ('wmic path Win32_DesktopMonitor get DeviceID^| findstr /l "DesktopMonitor"') do reg add "!VIDEO_ADAPTER_PATH!" /v Display%%_PipeOptimizationEnable /t REG_DWORD /d "1" /f >nul 2>&1
+for /f "delims=DesktopMonitor, " %%i in ('wmic path Win32_DesktopMonitor get DeviceID^| findstr /l "DesktopMonitor"') do reg add "!VIDEO_ADAPTER_PATH!" /v Display%%i_PipeOptimizationEnable /t REG_DWORD /d "1" /f >nul 2>&1
 
 if "!GPU!"=="NVIDIA" (
     echo Unhide silk smooth
