@@ -395,7 +395,7 @@ reg add "HKCU\Control Panel\Accessibility\MouseKeys" /v "TimeToMaximumSpeed" /t 
 echo SvcHostSplitThreshold
 reg add "HKLM\SYSTEM\CurrentControlSet\Control" /v "SvcHostSplitThresholdInKB" /t REG_DWORD /d "!SVCHOST!" /f >nul 2>&1
 
-echo Memory & disk
+echo Memory and disk
 reg add "HKLM\SYSTEM\currentcontrolset\control\filesystem" /v "ContigFileAllocSize" /t REG_DWORD /d "1536" /f >nul 2>&1
 reg add "HKLM\SYSTEM\currentcontrolset\control\filesystem" /v "DisableDeleteNotification" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\SYSTEM\currentcontrolset\control\filesystem" /v "DontVerifyRandomDrivers" /t REG_DWORD /d "1" /f >nul 2>&1
@@ -467,7 +467,7 @@ reg add "HKLM\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Explorer" /v
 reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" /v "EnableWebContentEvaluation" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" /v "EnableWebContentEvaluation" /t REG_DWORD /d "0" /f >nul 2>&1
 
-echo Clean Image File Execution Options & set csrss to realtime
+echo Clean Image File Execution Options and set csrss to realtime
 for /f "tokens=*" %%i in ('reg query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options"') do reg delete "%%i" /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\csrss.exe\PerfOptions" /v "CpuPriorityClass" /t REG_DWORD /d "4" /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\csrss.exe\PerfOptions" /v "IoPriority" /t REG_DWORD /d "3" /f >nul 2>&1
@@ -560,7 +560,7 @@ for %%i in (HKLM\SOFTWARE HKLM\SOFTWARE\WOW6432Node HKCU\SOFTWARE) do (
 echo Disable event windows
 reg add "HKLM\SOFTWARE\Microsoft\Wbem\CIMOM" /v "EnableEvents" /t REG_DWORD /d "0" /f >nul 2>&1
 
-echo Disable Preemption & V-Sync Idle Timeout for gpu
+echo Disable Preemption and V-Sync Idle Timeout for gpu
 reg add "HKLM\System\CurrentControlSet\Control\GraphicsDrivers\Scheduler" /v "EnablePreemption" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\System\CurrentControlSet\Control\GraphicsDrivers\Scheduler" /v "VsyncIdleTimeout" /t REG_DWORD /d "0" /f >nul 2>&1
 
@@ -630,7 +630,7 @@ if "!GPU!"=="AMD" (
 
 echo Disable Services
 for %%i in (AarSvc AeLookupSvc BcastDVRUserService CaptureService cbdhsvc CDPSvc CDPUserSvc
-    ConsentUxUserSvc CredentialEnrollmentManagerUserSvc DcpSvc DeviceAssociationBrokerSvc 
+    ConsentUxUserSvc CredentialEnrollmentManagerUserSvc DcpSvc DeviceAssociationBrokerSvc
     DeviceAssociationService DevicePickerUserSvc DevicesFlowUserSvc diagnosticshub.standardcollector.service
     diagsvc DiagTrack DmWapPushService DoSvc DPS DsSvc HPTouchpointAnalyticsService IEEtwCollectorService
     InstallService lfsvc LxpSvc MessagingService NcaSvc NetMsmqActivator OneSyncSvc
