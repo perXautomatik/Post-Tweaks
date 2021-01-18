@@ -51,7 +51,10 @@ whoami /user | find /i "S-1-5-18" >nul 2>&1
 if !ERRORLEVEL! neq 0 call "modules\nsudo.exe" -U:T -P:E -UseCurrentConsole "%~dpnx0" && exit
 
 call:CURL "1" "https://raw.githubusercontent.com/ArtanisInc/Post-Tweaks/main/version.txt" "version.txt"
-if !ERRORLEVEL! equ 0 for /f "tokens=1,2 delims= " %%i in (version.txt) do set LATEST_VERSION=%%i & set LATEST_VERSION_INFO=%%j
+if !ERRORLEVEL! equ 0 (
+    for /f "tokens=1 delims= " %%i in (version.txt) do set LATEST_VERSION=%%i
+    for /f "tokens=1,2 delims= " %%i in (version.txt) do set LATEST_VERSION_INFO=%%j
+)
 if exist "version.txt" del /f /q "version.txt" >nul 2>&1
 
 if /i !VERSION! lss !LATEST_VERSION! (
