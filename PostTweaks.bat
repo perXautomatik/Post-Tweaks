@@ -348,9 +348,6 @@ reg add "HKCU\Control Panel\Mouse" /v "MouseThreshold2" /t REG_SZ /d "0" /f >nul
 echo Disabling DWM composition
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "CompositionPolicy" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "Composition" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "EnableWindowColorization" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "EnableAeroPeek" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "AlwaysHibernateThumbnails" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DWM" /v "DisallowComposition" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DWM" /v "DWMWA_TRANSITIONS_FORCEDISABLED" /t REG_DWORD /d "1" /f >nul 2>&1
 
@@ -568,7 +565,7 @@ echo GPU scheduling
 reg add "HKLM\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" /v "HwSchedMode" /t REG_DWORD /d "2" /f >nul 2>&1
 
 echo Display tweaks
-for /f "delims=DesktopMonitor, " %%i in ('wmic path Win32_DesktopMonitor get DeviceID^| findstr /l "DesktopMonitor"') do reg add "!VIDEO_ADAPTER_PATH!" /v Display%%i_PipeOptimizationEnable /t REG_DWORD /d "1" /f >nul 2>&1
+for /f "delims=DesktopMonitor, " %%i in ('wmic path Win32_DesktopMonitor get DeviceID^| findstr /l "DesktopMonitor"') do reg add "!VIDEO_ADAPTER_PATH!" /v "Display%%i_PipeOptimizationEnable" /t REG_DWORD /d "1" /f >nul 2>&1
 
 if "!GPU!"=="NVIDIA" (
     echo Unhide silk smooth
@@ -1285,13 +1282,18 @@ call:CURL -L "https://gist.githubusercontent.com/ArtanisInc/74081e8f0548105412e8
 ::                                      =======================================================
 
 echo Visual effects
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d "3" /f >nul 2>&1
+reg add "HKCU\Control Panel\Desktop" /v "UserPreferencesMask" /t REG_BINARY /d "9012038010000000" /f >nul 2>&1
+reg add "HKCU\Control Panel\Desktop" /v "FontSmoothing" /t REG_SZ /d "2" /f >nul 2>&1
+reg add "HKCU\Control Panel\Desktop" /v "DragFullWindows" /t REG_SZ /d "1" /f >nul 2>&1
 reg add "HKCU\Control Panel\Desktop\WindowMetrics" /v "MinAnimate" /t REG_SZ /d "0" /f >nul 2>&1
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" /v "ShellState" /t REG_BINARY /d "240000003E28000000000000000000000000000001000000130000000000000072000000" /f >nul 2>&1
-reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" /v "VisualFXSetting" /t REG_DWORD /d "2" /f >nul 2>&1
-reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "IconsOnly" /t REG_DWORD /d "1" /f >nul 2>&1
+reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "IconsOnly" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewAlphaSelect" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "ListviewShadow" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "TaskbarAnimations" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "EnableWindowColorization" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "EnableAeroPeek" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKCU\SOFTWARE\Microsoft\Windows\DWM" /v "AlwaysHibernateThumbnails" /t REG_DWORD /d "0" /f >nul 2>&1
 
 echo Interface tweaks
 call "modules\choicebox.exe" "Remove 3D Objects from File Explorer;Remove library from File Explorer;Remove Favorites from File Explorer;Remove family group from File Explorer;Remove network from File Explorer;Remove OneDrive from File Explorer;Remove Quick Access from File Explorer;Remove all folders in 'This PC' from File Explorer;Hide Search box in taskbar;Hide Taskview in taskbar;Hide Action Center Tray in taskbar;Hide Contact in taskbar;Hide language bar in taskbar;Hide Windows Ink Workspace in taskbar;Disable animations in taskbar;Use small icons in taskbar;Show all icons in the notification area in taskbar;Show seconds on the clock in taskbar;Theme disable transparency (blur);Theme enable Dark Mode;Reduce size of buttons close minimize maximize;Show file extensions;Show Hidden folders;Disable Recent items and Frequent Places;Remove <Shortcut> suffix to the created shortcuts;Enable classic volume control;Enable classic alt tab;Enable windows 8 network flayout" " " "Interface" /C:2 >"%TMP%\interface.txt"
@@ -1745,7 +1747,7 @@ if "!HWiNFO!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! HWiNFO" (
 )
 if "!CrystalDiskInfo!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CrystalDiskInfo" (
     set "OPENTOOLS=True"
-    call:CURL "0" "https://dotsrc.dl.osdn.net/osdn/crystaldiskinfo/73507/CrystalDiskInfo8_8_7.zip" "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip"
+    call:CURL "0" "https://dotsrc.dl.osdn.net/osdn/crystaldiskinfo/73507/CrystalDiskInfo8_8_9.zip" "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip"
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip"  -O"%UserProfile%\Documents\_Tools\CrystalDiskInfo">nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip" >nul 2>&1
 )
@@ -1756,10 +1758,10 @@ if "!Snappy Driver Installer!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Sna
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\Snappy Driver Installer\SDI.zip"  -O"%UserProfile%\Documents\_Tools\Snappy Driver Installer">nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\Snappy Driver Installer\SDI.zip" >nul 2>&1
 )
-if "!NVCleanstall!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! NVCleanstall" set "OPENTOOLS=True" & call:CURL "0" "https://nl1-dl.techpowerup.com/files/NVCleanstall_1.7.0.exe#/NVCleanstall.exe" "%UserProfile%\Documents\_Tools\NVCleanstall.exe"
+if "!NVCleanstall!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! NVCleanstall" set "OPENTOOLS=True" & call:CURL "0" "https://nl1-dl.techpowerup.com/files/NVCleanstall_1.8.0.exe#/NVCleanstall.exe" "%UserProfile%\Documents\_Tools\NVCleanstall.exe"
 if "!Radeon Software Slimmer!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Radeon Software Slimmer" (
     set "OPENTOOLS=True"
-    call:CURL "0" "https://github.com/GSDragoon/RadeonSoftwareSlimmer/releases/download/1.0.0-beta.6/RadeonSoftwareSlimmer_1.0.0-beta.6_net48.zip" "%UserProfile%\Documents\_Tools\Radeon Software Slimmer\RadeonSoftwareSlimmer.zip"
+    call:CURL "0" "https://github.com/GSDragoon/RadeonSoftwareSlimmer/releases/download/1.0.0-beta.10/RadeonSoftwareSlimmer_1.0.0-beta.10_net48.zip" "%UserProfile%\Documents\_Tools\Radeon Software Slimmer\RadeonSoftwareSlimmer.zip"
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\Radeon Software Slimmer\RadeonSoftwareSlimmer.zip"  -O"%UserProfile%\Documents\_Tools\Radeon Software Slimmer">nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\Radeon Software Slimmer\RadeonSoftwareSlimmer.zip" >nul 2>&1
 )
@@ -1780,7 +1782,7 @@ if "!CINEBENCH!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CINEBENCH" (
 )
 if "!AIDA64!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! AIDA64" (
     set "OPENTOOLS=True"
-    call:CURL "0" "https://download.aida64.com/aida64extreme625.zip" "%UserProfile%\Documents\_Tools\AIDA64\aida64extreme.zip"
+    call:CURL "0" "https://dl.comptoir.co/finalwire/aida64extreme632.zip" "%UserProfile%\Documents\_Tools\AIDA64\aida64extreme.zip"
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\AIDA64\aida64extreme.zip" -O"%UserProfile%\Documents\_Tools\AIDA64" >nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\AIDA64\aida64extreme.zip" >nul 2>&1
 )
@@ -1815,15 +1817,15 @@ if "!Nvidia Profile Inspector!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Nv
 )
 if "!GPU Pixel Clock Patcher!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GPU Pixel Clock Patcher" (
     set "OPENTOOLS=True"
-    call:CURL "0" "https://www.monitortests.com/download/nvlddmkm-patcher/nvlddmkm-patcher-1.4.12.zip" "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\Nvidia\nvlddmkm-patcher.zip"
-    call:CURL "0" "https://www.monitortests.com/download/atikmdag-patcher/atikmdag-patcher-1.4.8.zip" "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\AMD\atikmdag-patcher.zip"
+    call:CURL "0" "https://www.monitortests.com/download/nvlddmkm-patcher/nvlddmkm-patcher-1.4.13.zip" "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\Nvidia\nvlddmkm-patcher.zip"
+    call:CURL "0" "https://www.monitortests.com/download/atikmdag-patcher/atikmdag-patcher-1.4.9.zip" "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\AMD\atikmdag-patcher.zip"
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\Nvidia\nvlddmkm-patcher.zip" -O"%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\Nvidia" >nul 2>&1
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\AMD\atikmdag-patcher.zip" -O"%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\AMD" >nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\Nvidia\nvlddmkm-patcher.zip" >nul 2>&1 & del /f /q "%UserProfile%\Documents\_Tools\GPU Pixel Clock Patcher\AMD\atikmdag-patcher.zip" >nul 2>&1
 )
 if "!Custom Resolution Utility!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Custom Resolution Utility" (
     set "OPENTOOLS=True"
-    call:CURL "0" "https://www.monitortests.com/download/cru/cru-1.4.2.zip" "%UserProfile%\Documents\_Tools\Custom Resolution Utility\cru.zip"
+    call:CURL "0" "https://www.monitortests.com/download/cru/cru-1.5.1.zip" "%UserProfile%\Documents\_Tools\Custom Resolution Utility\cru.zip"
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\Custom Resolution Utility\cru.zip" -O"%UserProfile%\Documents\_Tools\Custom Resolution Utility" >nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\Custom Resolution Utility\cru.zip" >nul 2>&1
 )
