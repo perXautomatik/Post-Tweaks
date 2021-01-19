@@ -1809,7 +1809,7 @@ if "!DNS Jumper!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! DNS Jumper" (
 )
 if "!Nvidia Profile Inspector!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Nvidia Profile Inspector" (
     set "OPENTOOLS=True"
-    call:CURL "0" "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/download/2.3.0.12/nvidiaProfileInspector.zip" "%UserProfile%\Documents\_Tools\Nvidia Profile Inspector\nvidiaProfileInspector.zip"
+    call:CURL "0" "https://github.com/Orbmu2k/nvidiaProfileInspector/releases/download/2.3.0.13/nvidiaProfileInspector.zip" "%UserProfile%\Documents\_Tools\Nvidia Profile Inspector\nvidiaProfileInspector.zip"
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\Nvidia Profile Inspector\nvidiaProfileInspector.zip" -O"%UserProfile%\Documents\_Tools\Nvidia Profile Inspector" >nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\Nvidia Profile Inspector\nvidiaProfileInspector.zip" >nul 2>&1
 )
