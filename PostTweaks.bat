@@ -982,7 +982,7 @@ if "!DHCP!"=="Yes" (
 echo Network tweaks
 ipconfig /flushdns >nul 2>&1
 netsh winsock reset >nul 2>&1
-netsh winsock set autotuning on
+netsh winsock set autotuning on >nul 2>&1
 netsh interface ip delete arpcache >nul 2>&1
 netsh interface teredo set state disabled >nul 2>&1
 netsh interface 6to4 set state disabled >nul 2>&1
