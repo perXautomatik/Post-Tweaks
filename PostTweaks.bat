@@ -980,13 +980,14 @@ if "!DHCP!"=="Yes" (
 )
 
 echo Network tweaks
-netsh winsock reset >nul 2>&1
 ipconfig /flushdns >nul 2>&1
+netsh winsock reset >nul 2>&1
+netsh winsock set autotuning on
 netsh interface ip delete arpcache >nul 2>&1
 netsh interface teredo set state disabled >nul 2>&1
 netsh interface 6to4 set state disabled >nul 2>&1
 netsh int isatap set state disable >nul 2>&1
-netsh int tcp set global autotuninglevel=disabled >nul 2>&1
+netsh int tcp set global autotuninglevel=normal >nul 2>&1
 netsh int tcp set heuristics disabled >nul 2>&1
 netsh int tcp set supplemental internet congestionprovider=CUBIC >nul 2>&1
 netsh int tcp set global ecncapability=disabled >nul 2>&1
