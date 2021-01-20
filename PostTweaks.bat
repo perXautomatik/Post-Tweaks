@@ -5,8 +5,8 @@ chcp 65001 >nul 2>&1
 cd /d "%~dp0"
 title Post Tweaks
 
-set VERSION=1.3
-set VERSION_INFO=18/01/2021
+set VERSION=1.4
+set VERSION_INFO=20/01/2021
 
 call:SETVARIABLES >nul 2>&1
 
@@ -595,7 +595,7 @@ if "!GPU!"=="NVIDIA" (
         RMLpwrGrRgIdleThresholduS RMLpwrMsIdleThresholduS VRDirectFlipDPCDelayuS
         VRDirectFlipTimingMarginuS VRDirectJITFlipMsHybridFlipDelayuS vrrCursorMarginuS
         vrrDeflickerMarginuS vrrDeflickerMaxUs) do reg add "!VIDEO_ADAPTER_PATH!" /v "%%i" /t REG_DWORD /d "1" /f >nul 2>&1
-    echo Import Nvidia settings
+    echo Importing Nvidia settings
     taskkill /f /im "nvcplui.exe" >nul 2>&1
     copy /y "resources\nvdrsdb0.bin" "%ProgramData%\NVIDIA Corporation\Drs" >nul 2>&1
     copy /y "resources\nvdrsdb1.bin" "%ProgramData%\NVIDIA Corporation\Drs" >nul 2>&1
@@ -629,11 +629,11 @@ echo Disabling Services
 for %%i in (AarSvc AeLookupSvc BcastDVRUserService CaptureService cbdhsvc CDPSvc CDPUserSvc
     ConsentUxUserSvc CredentialEnrollmentManagerUserSvc DcpSvc DeviceAssociationBrokerSvc
     DeviceAssociationService DevicePickerUserSvc DevicesFlowUserSvc diagnosticshub.standardcollector.service
-    diagsvc DiagTrack DmWapPushService DoSvc DPS DsSvc HPTouchpointAnalyticsService IEEtwCollectorService
-    InstallService lfsvc LxpSvc MessagingService NcaSvc NetMsmqActivator OneSyncSvc
-    PimIndexMaintenanceSvc PushToInstall RetailDemo shpamsvc SmsRouter srv SSDPSRV StorSvc TrkWks
-    UevAgentService UnistoreSvc upnphost UserDataSvc VDWFP VisualDiscovery W32Time WdiServiceHost
-    WdiSystemHost WebClient wercplsupport WerSvc WinHttpAutoProxySvc WinRM wisvc wlidsvc WMPNetworkSvc WpnService WpnUserService) do (
+    diagsvc DiagTrack DmWapPushService DoSvc DPS DsSvc IEEtwCollectorService InstallService
+    lfsvc LxpSvc MessagingService NcaSvc NetMsmqActivator OneSyncSvc PimIndexMaintenanceSvc
+    PushToInstall RetailDemo shpamsvc SmsRouter srv SSDPSRV StorSvc TrkWks UevAgentService
+    UnistoreSvc upnphost UserDataSvc W32Time WdiServiceHost WdiSystemHost WebClient wercplsupport
+    WerSvc WinHttpAutoProxySvc WinRM wisvc wlidsvc WMPNetworkSvc WpnService WpnUserService) do (
     reg query "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /ve >nul 2>&1
     if !ERRORLEVEL! equ 0 reg add "HKLM\SYSTEM\CurrentControlSet\Services\%%i" /v "Start" /t REG_DWORD /d "4" /f >nul 2>&1
 )
@@ -1532,57 +1532,58 @@ echo.
 set choice=
 set /p "choice=!S_GREEN!                                                                 "
 :: WEB BROWSERS
-if "!choice!"=="1" if "!Chromium!"=="!S_MAGENTA![ ]!S_WHITE! Chromium" (set "Chromium=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Chromium" && goto APPS_MENU) else set "Chromium=!S_MAGENTA![ ]!S_WHITE! Chromium" && goto APPS_MENU
-if "!choice!"=="2" if "!Mozilla Firefox!"=="!S_MAGENTA![ ]!S_WHITE! Mozilla Firefox" (set "Mozilla Firefox=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Mozilla Firefox" && goto APPS_MENU) else set "Mozilla Firefox=!S_MAGENTA![ ]!S_WHITE! Mozilla Firefox" && goto APPS_MENU
-if "!choice!"=="3" if "!Brave!"=="!S_MAGENTA![ ]!S_WHITE! Brave" (set "Brave=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Brave" && goto APPS_MENU) else set "Brave=!S_MAGENTA![ ]!S_WHITE! Brave" && goto APPS_MENU
-if "!choice!"=="4" if "!Opera GX!"=="!S_MAGENTA![ ]!S_WHITE! Opera GX" (set "Opera GX=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Opera GX" && goto APPS_MENU) else set "Opera GX=!S_MAGENTA![ ]!S_WHITE! Opera GX" && goto APPS_MENU
+if "!choice!"=="1" if "!Chromium!"=="!S_MAGENTA![ ]!S_WHITE! Chromium" (set "Chromium=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Chromium") else set "Chromium=!S_MAGENTA![ ]!S_WHITE! Chromium"
+if "!choice!"=="2" if "!Mozilla Firefox!"=="!S_MAGENTA![ ]!S_WHITE! Mozilla Firefox" (set "Mozilla Firefox=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Mozilla Firefox") else set "Mozilla Firefox=!S_MAGENTA![ ]!S_WHITE! Mozilla Firefox"
+if "!choice!"=="3" if "!Brave!"=="!S_MAGENTA![ ]!S_WHITE! Brave" (set "Brave=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Brave") else set "Brave=!S_MAGENTA![ ]!S_WHITE! Brave"
+if "!choice!"=="4" if "!Opera GX!"=="!S_MAGENTA![ ]!S_WHITE! Opera GX" (set "Opera GX=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Opera GX") else set "Opera GX=!S_MAGENTA![ ]!S_WHITE! Opera GX"
 :: MEDIA
-if "!choice!"=="5" if "!Deezer!"=="!S_MAGENTA![ ]!S_WHITE! Deezer" (set "Deezer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Deezer" && goto APPS_MENU) else set "Deezer=!S_MAGENTA![ ]!S_WHITE! Deezer" && goto APPS_MENU
-if "!choice!"=="6" if "!Spotify!"=="!S_MAGENTA![ ]!S_WHITE! Spotify" (set "Spotify=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Spotify" && goto APPS_MENU) else set "Spotify=!S_MAGENTA![ ]!S_WHITE! Spotify" && goto APPS_MENU
-if "!choice!"=="7" if "!iTunes!"=="!S_MAGENTA![ ]!S_WHITE! iTunes" (set "iTunes=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! iTunes" && goto APPS_MENU) else set "iTunes=!S_MAGENTA![ ]!S_WHITE! iTunes" && goto APPS_MENU
-if "!choice!"=="8" if "!PotPlayer!"=="!S_MAGENTA![ ]!S_WHITE! PotPlayer" (set "PotPlayer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! PotPlayer" && goto APPS_MENU) else set "PotPlayer=!S_MAGENTA![ ]!S_WHITE! PotPlayer" && goto APPS_MENU
-if "!choice!"=="9" if "!VLC media player!"=="!S_MAGENTA![ ]!S_WHITE! VLC media player" (set "VLC media player=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! VLC media player" && goto APPS_MENU) else set "VLC media player=!S_MAGENTA![ ]!S_WHITE! VLC media player" && goto APPS_MENU
-if "!choice!"=="10" if "!Audacity!"=="!S_MAGENTA![ ]!S_WHITE! Audacity" (set "Audacity=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Audacity" && goto APPS_MENU) else set "Audacity=!S_MAGENTA![ ]!S_WHITE! Audacity" && goto APPS_MENU
+if "!choice!"=="5" if "!Deezer!"=="!S_MAGENTA![ ]!S_WHITE! Deezer" (set "Deezer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Deezer") else set "Deezer=!S_MAGENTA![ ]!S_WHITE! Deezer"
+if "!choice!"=="6" if "!Spotify!"=="!S_MAGENTA![ ]!S_WHITE! Spotify" (set "Spotify=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Spotify") else set "Spotify=!S_MAGENTA![ ]!S_WHITE! Spotify"
+if "!choice!"=="7" if "!iTunes!"=="!S_MAGENTA![ ]!S_WHITE! iTunes" (set "iTunes=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! iTunes") else set "iTunes=!S_MAGENTA![ ]!S_WHITE! iTunes"
+if "!choice!"=="8" if "!PotPlayer!"=="!S_MAGENTA![ ]!S_WHITE! PotPlayer" (set "PotPlayer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! PotPlayer") else set "PotPlayer=!S_MAGENTA![ ]!S_WHITE! PotPlayer"
+if "!choice!"=="9" if "!VLC media player!"=="!S_MAGENTA![ ]!S_WHITE! VLC media player" (set "VLC media player=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! VLC media player") else set "VLC media player=!S_MAGENTA![ ]!S_WHITE! VLC media player"
+if "!choice!"=="10" if "!Audacity!"=="!S_MAGENTA![ ]!S_WHITE! Audacity" (set "Audacity=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Audacity") else set "Audacity=!S_MAGENTA![ ]!S_WHITE! Audacity"
 :: IMAGING
-if "!choice!"=="11" if "!ImageGlass!"=="!S_MAGENTA![ ]!S_WHITE! ImageGlass" (set "ImageGlass=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ImageGlass" && goto APPS_MENU) else set "ImageGlass=!S_MAGENTA![ ]!S_WHITE! ImageGlass" && goto APPS_MENU
-if "!choice!"=="12" if "!ShareX!"=="!S_MAGENTA![ ]!S_WHITE! ShareX" (set "ShareX=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ShareX" && goto APPS_MENU) else set "ShareX=!S_MAGENTA![ ]!S_WHITE! ShareX" && goto APPS_MENU
-if "!choice!"=="13" if "!GIMP!"=="!S_MAGENTA![ ]!S_WHITE! GIMP" (set "GIMP=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GIMP" && goto APPS_MENU) else set "GIMP=!S_MAGENTA![ ]!S_WHITE! GIMP" && goto APPS_MENU
+if "!choice!"=="11" if "!ImageGlass!"=="!S_MAGENTA![ ]!S_WHITE! ImageGlass" (set "ImageGlass=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ImageGlass") else set "ImageGlass=!S_MAGENTA![ ]!S_WHITE! ImageGlass"
+if "!choice!"=="12" if "!ShareX!"=="!S_MAGENTA![ ]!S_WHITE! ShareX" (set "ShareX=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ShareX") else set "ShareX=!S_MAGENTA![ ]!S_WHITE! ShareX"
+if "!choice!"=="13" if "!GIMP!"=="!S_MAGENTA![ ]!S_WHITE! GIMP" (set "GIMP=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GIMP") else set "GIMP=!S_MAGENTA![ ]!S_WHITE! GIMP"
 :: MESSAGING
-if "!choice!"=="14" if "!Discord!"=="!S_MAGENTA![ ]!S_WHITE! Discord" (set "Discord=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Discord" && goto APPS_MENU) else set "Discord=!S_MAGENTA![ ]!S_WHITE! Discord" && goto APPS_MENU
-if "!choice!"=="15" if "!Ripcord!"=="!S_MAGENTA![ ]!S_WHITE! Ripcord" (set "Ripcord=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Ripcord" && goto APPS_MENU) else set "Ripcord=!S_MAGENTA![ ]!S_WHITE! Ripcord" && goto APPS_MENU
-if "!choice!"=="16" if "!TeamSpeak!"=="!S_MAGENTA![ ]!S_WHITE! TeamSpeak" (set "TeamSpeak=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! TeamSpeak" && goto APPS_MENU) else set "TeamSpeak=!S_MAGENTA![ ]!S_WHITE! TeamSpeak" && goto APPS_MENU
-if "!choice!"=="17" if "!Skype!"=="!S_MAGENTA![ ]!S_WHITE! Skype" (set "Skype=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Skype" && goto APPS_MENU) else set "Skype=!S_MAGENTA![ ]!S_WHITE! Skype" && goto APPS_MENU
-if "!choice!"=="18" if "!Zoom!"=="!S_MAGENTA![ ]!S_WHITE! Zoom" (set "Zoom=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Zoom" && goto APPS_MENU) else set "Zoom=!S_MAGENTA![ ]!S_WHITE! Zoom" && goto APPS_MENU
+if "!choice!"=="14" if "!Discord!"=="!S_MAGENTA![ ]!S_WHITE! Discord" (set "Discord=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Discord") else set "Discord=!S_MAGENTA![ ]!S_WHITE! Discord"
+if "!choice!"=="15" if "!Ripcord!"=="!S_MAGENTA![ ]!S_WHITE! Ripcord" (set "Ripcord=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Ripcord") else set "Ripcord=!S_MAGENTA![ ]!S_WHITE! Ripcord"
+if "!choice!"=="16" if "!TeamSpeak!"=="!S_MAGENTA![ ]!S_WHITE! TeamSpeak" (set "TeamSpeak=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! TeamSpeak") else set "TeamSpeak=!S_MAGENTA![ ]!S_WHITE! TeamSpeak"
+if "!choice!"=="17" if "!Skype!"=="!S_MAGENTA![ ]!S_WHITE! Skype" (set "Skype=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Skype") else set "Skype=!S_MAGENTA![ ]!S_WHITE! Skype"
+if "!choice!"=="18" if "!Zoom!"=="!S_MAGENTA![ ]!S_WHITE! Zoom" (set "Zoom=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Zoom") else set "Zoom=!S_MAGENTA![ ]!S_WHITE! Zoom"
 :: DOCUMENTS
-if "!choice!"=="19" if "!Foxit Reader!"=="!S_MAGENTA![ ]!S_WHITE! Foxit Reader" (set "Foxit Reader=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Foxit Reader" && goto APPS_MENU) else set "Foxit Reader=!S_MAGENTA![ ]!S_WHITE! Foxit Reader" && goto APPS_MENU
-if "!choice!"=="20" if "!Microsoft Office!"=="!S_MAGENTA![ ]!S_WHITE! Microsoft Office" (set "Microsoft Office=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Microsoft Office" && goto APPS_MENU) else set "Microsoft Office=!S_MAGENTA![ ]!S_WHITE! Microsoft Office" && goto APPS_MENU
-if "!choice!"=="21" if "!Libre Office!"=="!S_MAGENTA![ ]!S_WHITE! Libre Office" (set "Libre Office=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Libre Office" && goto APPS_MENU) else set "Libre Office=!S_MAGENTA![ ]!S_WHITE! Libre Office" && goto APPS_MENU
+if "!choice!"=="19" if "!Foxit Reader!"=="!S_MAGENTA![ ]!S_WHITE! Foxit Reader" (set "Foxit Reader=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Foxit Reader") else set "Foxit Reader=!S_MAGENTA![ ]!S_WHITE! Foxit Reader"
+if "!choice!"=="20" if "!Microsoft Office!"=="!S_MAGENTA![ ]!S_WHITE! Microsoft Office" (set "Microsoft Office=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Microsoft Office") else set "Microsoft Office=!S_MAGENTA![ ]!S_WHITE! Microsoft Office"
+if "!choice!"=="21" if "!Libre Office!"=="!S_MAGENTA![ ]!S_WHITE! Libre Office" (set "Libre Office=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Libre Office") else set "Libre Office=!S_MAGENTA![ ]!S_WHITE! Libre Office"
 :: COMPRESSION
-if "!choice!"=="22" if "!Easy 7zip!"=="!S_MAGENTA![ ]!S_WHITE! Easy 7zip" (set "Easy 7zip=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Easy 7zip" && goto APPS_MENU) else set "Easy 7zip=!S_MAGENTA![ ]!S_WHITE! Easy 7zip" && goto APPS_MENU
-if "!choice!"=="23" if "!Winrar!"=="!S_MAGENTA![ ]!S_WHITE! Winrar" (set "Winrar=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Winrar" && goto APPS_MENU) else set "Winrar=!S_MAGENTA![ ]!S_WHITE! Winrar" && goto APPS_MENU
+if "!choice!"=="22" if "!Easy 7zip!"=="!S_MAGENTA![ ]!S_WHITE! Easy 7zip" (set "Easy 7zip=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Easy 7zip") else set "Easy 7zip=!S_MAGENTA![ ]!S_WHITE! Easy 7zip"
+if "!choice!"=="23" if "!Winrar!"=="!S_MAGENTA![ ]!S_WHITE! Winrar" (set "Winrar=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Winrar") else set "Winrar=!S_MAGENTA![ ]!S_WHITE! Winrar"
 :: DEVELOPER TOOLS
-if "!choice!"=="24" if "!Visual Studio Code!"=="!S_MAGENTA![ ]!S_WHITE! Visual Studio Code" (set "Visual Studio Code=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Visual Studio Code" && goto APPS_MENU) else set "Visual Studio Code=!S_MAGENTA![ ]!S_WHITE! Visual Studio Code" && goto APPS_MENU
-if "!choice!"=="25" if "!Notepad++!"=="!S_MAGENTA![ ]!S_WHITE! Notepad++" (set "Notepad++=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Notepad++" && goto APPS_MENU) else set "Notepad++=!S_MAGENTA![ ]!S_WHITE! Notepad++" && goto APPS_MENU
-if "!choice!"=="26" if "!FileZilla!"=="!S_MAGENTA![ ]!S_WHITE! FileZilla" (set "FileZilla=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! FileZilla" && goto APPS_MENU) else set "FileZilla=!S_MAGENTA![ ]!S_WHITE! FileZilla" && goto APPS_MENU
-if "!choice!"=="27" if "!PuTTY!"=="!S_MAGENTA![ ]!S_WHITE! PuTTY" (set "PuTTY=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! PuTTY" && goto APPS_MENU) else set "PuTTY=!S_MAGENTA![ ]!S_WHITE! PuTTY" && goto APPS_MENU
-if "!choice!"=="28" if "!Python!"=="!S_MAGENTA![ ]!S_WHITE! Python" (set "Python=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Python" && goto APPS_MENU) else set "Python=!S_MAGENTA![ ]!S_WHITE! Python" && goto APPS_MENU
+if "!choice!"=="24" if "!Visual Studio Code!"=="!S_MAGENTA![ ]!S_WHITE! Visual Studio Code" (set "Visual Studio Code=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Visual Studio Code") else set "Visual Studio Code=!S_MAGENTA![ ]!S_WHITE! Visual Studio Code"
+if "!choice!"=="25" if "!Notepad++!"=="!S_MAGENTA![ ]!S_WHITE! Notepad++" (set "Notepad++=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Notepad++") else set "Notepad++=!S_MAGENTA![ ]!S_WHITE! Notepad++"
+if "!choice!"=="26" if "!FileZilla!"=="!S_MAGENTA![ ]!S_WHITE! FileZilla" (set "FileZilla=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! FileZilla") else set "FileZilla=!S_MAGENTA![ ]!S_WHITE! FileZilla"
+if "!choice!"=="27" if "!PuTTY!"=="!S_MAGENTA![ ]!S_WHITE! PuTTY" (set "PuTTY=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! PuTTY") else set "PuTTY=!S_MAGENTA![ ]!S_WHITE! PuTTY"
+if "!choice!"=="28" if "!Python!"=="!S_MAGENTA![ ]!S_WHITE! Python" (set "Python=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Python") else set "Python=!S_MAGENTA![ ]!S_WHITE! Python"
 :: GAMES LAUNCHER
-if "!choice!"=="29" if "!Steam!"=="!S_MAGENTA![ ]!S_WHITE! Steam" (set "Steam=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Steam" && goto APPS_MENU) else set "Steam=!S_MAGENTA![ ]!S_WHITE! Steam" && goto APPS_MENU
-if "!choice!"=="30" if "!GOG Galaxy!"=="!S_MAGENTA![ ]!S_WHITE! GOG Galaxy" (set "GOG Galaxy=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GOG Galaxy" && goto APPS_MENU) else set "GOG Galaxy=!S_MAGENTA![ ]!S_WHITE! GOG Galaxy" && goto APPS_MENU
-if "!choice!"=="31" if "!Epic Games!"=="!S_MAGENTA![ ]!S_WHITE! Epic Games" (set "Epic Games=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Epic Games" && goto APPS_MENU) else set "Epic Games=!S_MAGENTA![ ]!S_WHITE! Epic Games" && goto APPS_MENU
-if "!choice!"=="32" if "!Uplay!"=="!S_MAGENTA![ ]!S_WHITE! Uplay" (set "Uplay=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Uplay" && goto APPS_MENU) else set "Uplay=!S_MAGENTA![ ]!S_WHITE! Uplay" && goto APPS_MENU
-if "!choice!"=="33" if "!Battle.net!"=="!S_MAGENTA![ ]!S_WHITE! Battle.net" (set "Battle.net=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Battle.net" && goto APPS_MENU) else set "Battle.net=!S_MAGENTA![ ]!S_WHITE! Battle.net" && goto APPS_MENU
-if "!choice!"=="34" if "!Origin!"=="!S_MAGENTA![ ]!S_WHITE! Origin" (set "Origin=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Origin" && goto APPS_MENU) else set "Origin=!S_MAGENTA![ ]!S_WHITE! Origin" && goto APPS_MENU
+if "!choice!"=="29" if "!Steam!"=="!S_MAGENTA![ ]!S_WHITE! Steam" (set "Steam=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Steam") else set "Steam=!S_MAGENTA![ ]!S_WHITE! Steam"
+if "!choice!"=="30" if "!GOG Galaxy!"=="!S_MAGENTA![ ]!S_WHITE! GOG Galaxy" (set "GOG Galaxy=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GOG Galaxy") else set "GOG Galaxy=!S_MAGENTA![ ]!S_WHITE! GOG Galaxy"
+if "!choice!"=="31" if "!Epic Games!"=="!S_MAGENTA![ ]!S_WHITE! Epic Games" (set "Epic Games=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Epic Games") else set "Epic Games=!S_MAGENTA![ ]!S_WHITE! Epic Games"
+if "!choice!"=="32" if "!Uplay!"=="!S_MAGENTA![ ]!S_WHITE! Uplay" (set "Uplay=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Uplay") else set "Uplay=!S_MAGENTA![ ]!S_WHITE! Uplay"
+if "!choice!"=="33" if "!Battle.net!"=="!S_MAGENTA![ ]!S_WHITE! Battle.net" (set "Battle.net=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Battle.net") else set "Battle.net=!S_MAGENTA![ ]!S_WHITE! Battle.net"
+if "!choice!"=="34" if "!Origin!"=="!S_MAGENTA![ ]!S_WHITE! Origin" (set "Origin=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Origin") else set "Origin=!S_MAGENTA![ ]!S_WHITE! Origin"
 :: OTHERS
-if "!choice!"=="35" if "!qBittorrent!"=="!S_MAGENTA![ ]!S_WHITE! qBittorrent" (set "qBittorrent=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! qBittorrent" && goto APPS_MENU) else set "qBittorrent=!S_MAGENTA![ ]!S_WHITE! qBittorrent" && goto APPS_MENU
-if "!choice!"=="36" if "!TeamViewer!"=="!S_MAGENTA![ ]!S_WHITE! TeamViewer" (set "TeamViewer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! TeamViewer" && goto APPS_MENU) else set "TeamViewer=!S_MAGENTA![ ]!S_WHITE! TeamViewer" && goto APPS_MENU
-if "!choice!"=="37" if "!Revo Uninstaller!"=="!S_MAGENTA![ ]!S_WHITE! Revo Uninstaller" (set "Revo Uninstaller=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Revo Uninstaller" && goto APPS_MENU) else set "Revo Uninstaller=!S_MAGENTA![ ]!S_WHITE! Revo Uninstaller" && goto APPS_MENU
-if "!choice!"=="38" if "!Everything!"=="!S_MAGENTA![ ]!S_WHITE! Everything" (set "Everything=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Everything" && goto APPS_MENU) else set "Everything=!S_MAGENTA![ ]!S_WHITE! Everything" && goto APPS_MENU
-if "!choice!"=="39" if "!Vortex!"=="!S_MAGENTA![ ]!S_WHITE! Vortex" (set "Vortex=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Vortex" && goto APPS_MENU) else set "Vortex=!S_MAGENTA![ ]!S_WHITE! Vortex" && goto APPS_MENU
+if "!choice!"=="35" if "!qBittorrent!"=="!S_MAGENTA![ ]!S_WHITE! qBittorrent" (set "qBittorrent=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! qBittorrent") else set "qBittorrent=!S_MAGENTA![ ]!S_WHITE! qBittorrent"
+if "!choice!"=="36" if "!TeamViewer!"=="!S_MAGENTA![ ]!S_WHITE! TeamViewer" (set "TeamViewer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! TeamViewer") else set "TeamViewer=!S_MAGENTA![ ]!S_WHITE! TeamViewer"
+if "!choice!"=="37" if "!Revo Uninstaller!"=="!S_MAGENTA![ ]!S_WHITE! Revo Uninstaller" (set "Revo Uninstaller=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Revo Uninstaller") else set "Revo Uninstaller=!S_MAGENTA![ ]!S_WHITE! Revo Uninstaller"
+if "!choice!"=="38" if "!Everything!"=="!S_MAGENTA![ ]!S_WHITE! Everything" (set "Everything=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Everything") else set "Everything=!S_MAGENTA![ ]!S_WHITE! Everything"
+if "!choice!"=="39" if "!Vortex!"=="!S_MAGENTA![ ]!S_WHITE! Vortex" (set "Vortex=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Vortex") else set "Vortex=!S_MAGENTA![ ]!S_WHITE! Vortex"
 :: Recommended to install
-if "!choice!"=="40" if "!Visual C++ Redistributables!"=="!S_MAGENTA![ ]!S_WHITE! Visual C++ Redistributables" (set "Visual C++ Redistributables=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Visual C++ Redistributables" && goto APPS_MENU) else set "Visual C++ Redistributables=!S_MAGENTA![ ]!S_WHITE! Visual C++ Redistributables" && goto APPS_MENU
-if "!choice!"=="41" if "!DirectX!"=="!S_MAGENTA![ ]!S_WHITE! DirectX" (set "DirectX=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! DirectX" && goto APPS_MENU) else set "DirectX=!S_MAGENTA![ ]!S_WHITE! DirectX" && goto APPS_MENU
-if "!choice!"=="42" if "!.NET Framework 4.8!"=="!S_MAGENTA![ ]!S_WHITE! .NET Framework 4.8" (set ".NET Framework 4.8=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! .NET Framework 4.8" && goto APPS_MENU) else set ".NET Framework 4.8=!S_MAGENTA![ ]!S_WHITE! .NET Framework 4.8" && goto APPS_MENU
+if "!choice!"=="40" if "!Visual C++ Redistributables!"=="!S_MAGENTA![ ]!S_WHITE! Visual C++ Redistributables" (set "Visual C++ Redistributables=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Visual C++ Redistributables") else set "Visual C++ Redistributables=!S_MAGENTA![ ]!S_WHITE! Visual C++ Redistributables"
+if "!choice!"=="41" if "!DirectX!"=="!S_MAGENTA![ ]!S_WHITE! DirectX" (set "DirectX=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! DirectX") else set "DirectX=!S_MAGENTA![ ]!S_WHITE! DirectX"
+if "!choice!"=="42" if "!.NET Framework 4.8!"=="!S_MAGENTA![ ]!S_WHITE! .NET Framework 4.8" (set ".NET Framework 4.8=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! .NET Framework 4.8") else set ".NET Framework 4.8=!S_MAGENTA![ ]!S_WHITE! .NET Framework 4.8"
+for /l %%i in (1,1,42) do if "!choice!"=="%%i" goto APPS_MENU
 if "!choice!"=="" (
     for %%i in (!APPS_MENU!) do if "!%%~i!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! %%~i" goto APPS_INSTALL
     echo                                                  !RED!Error : !S_GREEN!"!choice!"!S_GRAY! is not a valid choice...
@@ -1684,39 +1685,40 @@ echo.
 set choice=
 set /p "choice=!S_GREEN!                                                                          "
 :: UTILITIES
-if "!choice!"=="1" if "!NSudo!"=="!S_MAGENTA![ ]!S_WHITE! NSudo" (set "NSudo=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! NSudo" && goto TOOLS_MENU) else set "NSudo=!S_MAGENTA![ ]!S_WHITE! NSudo" && goto TOOLS_MENU
-if "!choice!"=="2" if "!Autoruns!"=="!S_MAGENTA![ ]!S_WHITE! Autoruns" (set "Autoruns=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Autoruns" && goto TOOLS_MENU) else set "Autoruns=!S_MAGENTA![ ]!S_WHITE! Autoruns" && goto TOOLS_MENU
-if "!choice!"=="3" if "!ServiWin!"=="!S_MAGENTA![ ]!S_WHITE! ServiWin" (set "ServiWin=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ServiWin" && goto TOOLS_MENU) else set "ServiWin=!S_MAGENTA![ ]!S_WHITE! ServiWin" && goto TOOLS_MENU
-if "!choice!"=="4" if "!Memory Booster!"=="!S_MAGENTA![ ]!S_WHITE! Memory Booster" (set "Memory Booster=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Memory Booster" && goto TOOLS_MENU) else set "Memory Booster=!S_MAGENTA![ ]!S_WHITE! Memory Booster" && goto TOOLS_MENU
-if "!choice!"=="5" if "!Device Cleanup!"=="!S_MAGENTA![ ]!S_WHITE! Device Cleanup" (set "Device Cleanup=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Device Cleanup" && goto TOOLS_MENU) else set "Device Cleanup=!S_MAGENTA![ ]!S_WHITE! Device Cleanup" && goto TOOLS_MENU
-if "!choice!"=="6" if "!MSI Afterburner!"=="!S_MAGENTA![ ]!S_WHITE! MSI Afterburner" (set "MSI Afterburner=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! MSI Afterburner" && goto TOOLS_MENU) else set "MSI Afterburner=!S_MAGENTA![ ]!S_WHITE! MSI Afterburner" && goto TOOLS_MENU
+if "!choice!"=="1" if "!NSudo!"=="!S_MAGENTA![ ]!S_WHITE! NSudo" (set "NSudo=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! NSudo") else set "NSudo=!S_MAGENTA![ ]!S_WHITE! NSudo"
+if "!choice!"=="2" if "!Autoruns!"=="!S_MAGENTA![ ]!S_WHITE! Autoruns" (set "Autoruns=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Autoruns") else set "Autoruns=!S_MAGENTA![ ]!S_WHITE! Autoruns"
+if "!choice!"=="3" if "!ServiWin!"=="!S_MAGENTA![ ]!S_WHITE! ServiWin" (set "ServiWin=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ServiWin") else set "ServiWin=!S_MAGENTA![ ]!S_WHITE! ServiWin"
+if "!choice!"=="4" if "!Memory Booster!"=="!S_MAGENTA![ ]!S_WHITE! Memory Booster" (set "Memory Booster=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Memory Booster") else set "Memory Booster=!S_MAGENTA![ ]!S_WHITE! Memory Booster"
+if "!choice!"=="5" if "!Device Cleanup!"=="!S_MAGENTA![ ]!S_WHITE! Device Cleanup" (set "Device Cleanup=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Device Cleanup") else set "Device Cleanup=!S_MAGENTA![ ]!S_WHITE! Device Cleanup"
+if "!choice!"=="6" if "!MSI Afterburner!"=="!S_MAGENTA![ ]!S_WHITE! MSI Afterburner" (set "MSI Afterburner=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! MSI Afterburner") else set "MSI Afterburner=!S_MAGENTA![ ]!S_WHITE! MSI Afterburner"
 :: SYSTEM INFOS
-if "!choice!"=="7" if "!CPU-Z!"=="!S_MAGENTA![ ]!S_WHITE! CPU-Z" (set "CPU-Z=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CPU-Z" && goto TOOLS_MENU) else set "CPU-Z=!S_MAGENTA![ ]!S_WHITE! CPU-Z" && goto TOOLS_MENU
-if "!choice!"=="8" if "!GPU-Z!"=="!S_MAGENTA![ ]!S_WHITE! GPU-Z" (set "GPU-Z=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GPU-Z" && goto TOOLS_MENU) else set "GPU-Z=!S_MAGENTA![ ]!S_WHITE! GPU-Z" && goto TOOLS_MENU
-if "!choice!"=="9" if "!HWiNFO!"=="!S_MAGENTA![ ]!S_WHITE! HWiNFO" (set "HWiNFO=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! HWiNFO" && goto TOOLS_MENU) else set "HWiNFO=!S_MAGENTA![ ]!S_WHITE! HWiNFO" && goto TOOLS_MENU
-if "!choice!"=="10" if "!CrystalDiskInfo!"=="!S_MAGENTA![ ]!S_WHITE! CrystalDiskInfo" (set "CrystalDiskInfo=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CrystalDiskInfo" && goto TOOLS_MENU) else set "CrystalDiskInfo=!S_MAGENTA![ ]!S_WHITE! CrystalDiskInfo" && goto TOOLS_MENU
+if "!choice!"=="7" if "!CPU-Z!"=="!S_MAGENTA![ ]!S_WHITE! CPU-Z" (set "CPU-Z=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CPU-Z") else set "CPU-Z=!S_MAGENTA![ ]!S_WHITE! CPU-Z"
+if "!choice!"=="8" if "!GPU-Z!"=="!S_MAGENTA![ ]!S_WHITE! GPU-Z" (set "GPU-Z=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GPU-Z") else set "GPU-Z=!S_MAGENTA![ ]!S_WHITE! GPU-Z"
+if "!choice!"=="9" if "!HWiNFO!"=="!S_MAGENTA![ ]!S_WHITE! HWiNFO" (set "HWiNFO=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! HWiNFO") else set "HWiNFO=!S_MAGENTA![ ]!S_WHITE! HWiNFO"
+if "!choice!"=="10" if "!CrystalDiskInfo!"=="!S_MAGENTA![ ]!S_WHITE! CrystalDiskInfo" (set "CrystalDiskInfo=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CrystalDiskInfo") else set "CrystalDiskInfo=!S_MAGENTA![ ]!S_WHITE! CrystalDiskInfo"
 :: DRIVERS
-if "!choice!"=="11" if "!Snappy Driver Installer!"=="!S_MAGENTA![ ]!S_WHITE! Snappy Driver Installer" (set "Snappy Driver Installer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Snappy Driver Installer" && goto TOOLS_MENU) else set "Snappy Driver Installer=!S_MAGENTA![ ]!S_WHITE! Snappy Driver Installer" && goto TOOLS_MENU
-if "!choice!"=="12" if "!NVCleanstall!"=="!S_MAGENTA![ ]!S_WHITE! NVCleanstall" (set "NVCleanstall=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! NVCleanstall" && goto TOOLS_MENU) else set "NVCleanstall=!S_MAGENTA![ ]!S_WHITE! NVCleanstall" && goto TOOLS_MENU
-if "!choice!"=="13" if "!Radeon Software Slimmer!"=="!S_MAGENTA![ ]!S_WHITE! Radeon Software Slimmer" (set "Radeon Software Slimmer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Radeon Software Slimmer" && goto TOOLS_MENU) else set "Radeon Software Slimmer=!S_MAGENTA![ ]!S_WHITE! Radeon Software Slimmer" && goto TOOLS_MENU
-if "!choice!"=="14" if "!Display Driver Uninstaller!"=="!S_MAGENTA![ ]!S_WHITE! Display Driver Uninstaller" (set "Display Driver Uninstaller=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Display Driver Uninstaller" && goto TOOLS_MENU) else set "Display Driver Uninstaller=!S_MAGENTA![ ]!S_WHITE! Display Driver Uninstaller" && goto TOOLS_MENU
+if "!choice!"=="11" if "!Snappy Driver Installer!"=="!S_MAGENTA![ ]!S_WHITE! Snappy Driver Installer" (set "Snappy Driver Installer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Snappy Driver Installer") else set "Snappy Driver Installer=!S_MAGENTA![ ]!S_WHITE! Snappy Driver Installer"
+if "!choice!"=="12" if "!NVCleanstall!"=="!S_MAGENTA![ ]!S_WHITE! NVCleanstall" (set "NVCleanstall=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! NVCleanstall") else set "NVCleanstall=!S_MAGENTA![ ]!S_WHITE! NVCleanstall"
+if "!choice!"=="13" if "!Radeon Software Slimmer!"=="!S_MAGENTA![ ]!S_WHITE! Radeon Software Slimmer" (set "Radeon Software Slimmer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Radeon Software Slimmer") else set "Radeon Software Slimmer=!S_MAGENTA![ ]!S_WHITE! Radeon Software Slimmer"
+if "!choice!"=="14" if "!Display Driver Uninstaller!"=="!S_MAGENTA![ ]!S_WHITE! Display Driver Uninstaller" (set "Display Driver Uninstaller=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Display Driver Uninstaller") else set "Display Driver Uninstaller=!S_MAGENTA![ ]!S_WHITE! Display Driver Uninstaller"
 :: BENCHMARK & STRESS
-if "!choice!"=="15" if "!Unigine Superposition!"=="!S_MAGENTA![ ]!S_WHITE! Unigine Superposition" (set "Unigine Superposition=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Unigine Superposition" && goto TOOLS_MENU) else set "Unigine Superposition=!S_MAGENTA![ ]!S_WHITE! Unigine Superposition" && goto TOOLS_MENU
-if "!choice!"=="16" if "!CINEBENCH!"=="!S_MAGENTA![ ]!S_WHITE! CINEBENCH" (set "CINEBENCH=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CINEBENCH" && goto TOOLS_MENU) else set "CINEBENCH=!S_MAGENTA![ ]!S_WHITE! CINEBENCH" && goto TOOLS_MENU
-if "!choice!"=="17" if "!AIDA64!"=="!S_MAGENTA![ ]!S_WHITE! AIDA64" (set "AIDA64=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! AIDA64" && goto TOOLS_MENU) else set "AIDA64=!S_MAGENTA![ ]!S_WHITE! AIDA64" && goto TOOLS_MENU
-if "!choice!"=="18" if "!OCCT!"=="!S_MAGENTA![ ]!S_WHITE! OCCT" (set "OCCT=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! OCCT" && goto TOOLS_MENU) else set "OCCT=!S_MAGENTA![ ]!S_WHITE! OCCT" && goto TOOLS_MENU
-if "!choice!"=="19" if "!LatencyMon!"=="!S_MAGENTA![ ]!S_WHITE! LatencyMon" (set "LatencyMon=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! LatencyMon" && goto TOOLS_MENU) else set "LatencyMon=!S_MAGENTA![ ]!S_WHITE! LatencyMon" && goto TOOLS_MENU
+if "!choice!"=="15" if "!Unigine Superposition!"=="!S_MAGENTA![ ]!S_WHITE! Unigine Superposition" (set "Unigine Superposition=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Unigine Superposition") else set "Unigine Superposition=!S_MAGENTA![ ]!S_WHITE! Unigine Superposition"
+if "!choice!"=="16" if "!CINEBENCH!"=="!S_MAGENTA![ ]!S_WHITE! CINEBENCH" (set "CINEBENCH=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CINEBENCH") else set "CINEBENCH=!S_MAGENTA![ ]!S_WHITE! CINEBENCH"
+if "!choice!"=="17" if "!AIDA64!"=="!S_MAGENTA![ ]!S_WHITE! AIDA64" (set "AIDA64=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! AIDA64") else set "AIDA64=!S_MAGENTA![ ]!S_WHITE! AIDA64"
+if "!choice!"=="18" if "!OCCT!"=="!S_MAGENTA![ ]!S_WHITE! OCCT" (set "OCCT=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! OCCT") else set "OCCT=!S_MAGENTA![ ]!S_WHITE! OCCT"
+if "!choice!"=="19" if "!LatencyMon!"=="!S_MAGENTA![ ]!S_WHITE! LatencyMon" (set "LatencyMon=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! LatencyMon") else set "LatencyMon=!S_MAGENTA![ ]!S_WHITE! LatencyMon"
 :: TWEAKS
-if "!choice!"=="20" if "!MSI Util v3!"=="!S_MAGENTA![ ]!S_WHITE! MSI Util v3" (set "MSI Util v3=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! MSI Util v3" && goto TOOLS_MENU) else set "MSI Util v3=!S_MAGENTA![ ]!S_WHITE! MSI Util v3" && goto TOOLS_MENU
-if "!choice!"=="21" if "!Interrupt Affinity!"=="!S_MAGENTA![ ]!S_WHITE! Interrupt Affinity" (set "Interrupt Affinity=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Interrupt Affinity" && goto TOOLS_MENU) else set "Interrupt Affinity=!S_MAGENTA![ ]!S_WHITE! Interrupt Affinity" && goto TOOLS_MENU
-if "!choice!"=="22" if "!TCP Optimizer!"=="!S_MAGENTA![ ]!S_WHITE! TCP Optimizer" (set "TCP Optimizer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! TCP Optimizer" && goto TOOLS_MENU) else set "TCP Optimizer=!S_MAGENTA![ ]!S_WHITE! TCP Optimizer" && goto TOOLS_MENU
-if "!choice!"=="23" if "!WLAN Optimizer!"=="!S_MAGENTA![ ]!S_WHITE! WLAN Optimizer" (set "WLAN Optimizer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! WLAN Optimizer" && goto TOOLS_MENU) else set "WLAN Optimizer=!S_MAGENTA![ ]!S_WHITE! WLAN Optimizer" && goto TOOLS_MENU
-if "!choice!"=="24" if "!DNS Jumper!"=="!S_MAGENTA![ ]!S_WHITE! DNS Jumper" (set "DNS Jumper=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! DNS Jumper" && goto TOOLS_MENU) else set "DNS Jumper=!S_MAGENTA![ ]!S_WHITE! DNS Jumper" && goto TOOLS_MENU
-if "!choice!"=="25" if "!Nvidia Profile Inspector!"=="!S_MAGENTA![ ]!S_WHITE! Nvidia Profile Inspector" (set "Nvidia Profile Inspector=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Nvidia Profile Inspector" && goto TOOLS_MENU) else set "Nvidia Profile Inspector=!S_MAGENTA![ ]!S_WHITE! Nvidia Profile Inspector" && goto TOOLS_MENU
-if "!choice!"=="26" if "!GPU Pixel Clock Patcher!"=="!S_MAGENTA![ ]!S_WHITE! GPU Pixel Clock Patcher" (set "GPU Pixel Clock Patcher=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GPU Pixel Clock Patcher" && goto TOOLS_MENU) else set "GPU Pixel Clock Patcher=!S_MAGENTA![ ]!S_WHITE! GPU Pixel Clock Patcher" && goto TOOLS_MENU
-if "!choice!"=="27" if "!Custom Resolution Utility!"=="!S_MAGENTA![ ]!S_WHITE! Custom Resolution Utility" (set "Custom Resolution Utility=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Custom Resolution Utility" && goto TOOLS_MENU) else set "Custom Resolution Utility=!S_MAGENTA![ ]!S_WHITE! Custom Resolution Utility" && goto TOOLS_MENU
-if "!choice!"=="28" if "!SweetLow Mouse Rate Changer!"=="!S_MAGENTA![ ]!S_WHITE! SweetLow Mouse Rate Changer" (set "SweetLow Mouse Rate Changer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! SweetLow Mouse Rate Changer" && goto TOOLS_MENU) else set "SweetLow Mouse Rate Changer=!S_MAGENTA![ ]!S_WHITE! SweetLow Mouse Rate Changer" && goto TOOLS_MENU
-if "!choice!"=="29" if "!ThrottleStop!"=="!S_MAGENTA![ ]!S_WHITE! ThrottleStop" (set "ThrottleStop=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ThrottleStop" && goto TOOLS_MENU) else set "ThrottleStop=!S_MAGENTA![ ]!S_WHITE! ThrottleStop" && goto TOOLS_MENU
+if "!choice!"=="20" if "!MSI Util v3!"=="!S_MAGENTA![ ]!S_WHITE! MSI Util v3" (set "MSI Util v3=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! MSI Util v3") else set "MSI Util v3=!S_MAGENTA![ ]!S_WHITE! MSI Util v3"
+if "!choice!"=="21" if "!Interrupt Affinity!"=="!S_MAGENTA![ ]!S_WHITE! Interrupt Affinity" (set "Interrupt Affinity=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Interrupt Affinity") else set "Interrupt Affinity=!S_MAGENTA![ ]!S_WHITE! Interrupt Affinity"
+if "!choice!"=="22" if "!TCP Optimizer!"=="!S_MAGENTA![ ]!S_WHITE! TCP Optimizer" (set "TCP Optimizer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! TCP Optimizer") else set "TCP Optimizer=!S_MAGENTA![ ]!S_WHITE! TCP Optimizer"
+if "!choice!"=="23" if "!WLAN Optimizer!"=="!S_MAGENTA![ ]!S_WHITE! WLAN Optimizer" (set "WLAN Optimizer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! WLAN Optimizer") else set "WLAN Optimizer=!S_MAGENTA![ ]!S_WHITE! WLAN Optimizer"
+if "!choice!"=="24" if "!DNS Jumper!"=="!S_MAGENTA![ ]!S_WHITE! DNS Jumper" (set "DNS Jumper=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! DNS Jumper") else set "DNS Jumper=!S_MAGENTA![ ]!S_WHITE! DNS Jumper"
+if "!choice!"=="25" if "!Nvidia Profile Inspector!"=="!S_MAGENTA![ ]!S_WHITE! Nvidia Profile Inspector" (set "Nvidia Profile Inspector=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Nvidia Profile Inspector") else set "Nvidia Profile Inspector=!S_MAGENTA![ ]!S_WHITE! Nvidia Profile Inspector"
+if "!choice!"=="26" if "!GPU Pixel Clock Patcher!"=="!S_MAGENTA![ ]!S_WHITE! GPU Pixel Clock Patcher" (set "GPU Pixel Clock Patcher=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! GPU Pixel Clock Patcher") else set "GPU Pixel Clock Patcher=!S_MAGENTA![ ]!S_WHITE! GPU Pixel Clock Patcher"
+if "!choice!"=="27" if "!Custom Resolution Utility!"=="!S_MAGENTA![ ]!S_WHITE! Custom Resolution Utility" (set "Custom Resolution Utility=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! Custom Resolution Utility") else set "Custom Resolution Utility=!S_MAGENTA![ ]!S_WHITE! Custom Resolution Utility"
+if "!choice!"=="28" if "!SweetLow Mouse Rate Changer!"=="!S_MAGENTA![ ]!S_WHITE! SweetLow Mouse Rate Changer" (set "SweetLow Mouse Rate Changer=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! SweetLow Mouse Rate Changer") else set "SweetLow Mouse Rate Changer=!S_MAGENTA![ ]!S_WHITE! SweetLow Mouse Rate Changer"
+if "!choice!"=="29" if "!ThrottleStop!"=="!S_MAGENTA![ ]!S_WHITE! ThrottleStop" (set "ThrottleStop=!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! ThrottleStop") else set "ThrottleStop=!S_MAGENTA![ ]!S_WHITE! ThrottleStop"
+for /l %%i in (1,1,29) do if "!choice!"=="%%i" goto TOOLS_MENU
 if "!choice!"=="" (
     for %%i in (!TOOLS!) do if "!%%~i!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! %%~i" goto TOOLS_INSTALL
     echo                                                          !RED!Error : !S_GREEN!"!choice!"!S_GRAY! is not a valid choice...
