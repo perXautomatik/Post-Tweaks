@@ -82,7 +82,7 @@ if /i !VERSION! lss !LATEST_VERSION! (
         move "Post-Tweaks-main\PostTweaks.bat" "PostTweaks.bat" >nul 2>&1
         rd /s /q "Post-Tweaks-main" >nul 2>&1
         del /f /q "version.txt" >nul 2>&1
-        if exist "PostTweaks.bat" call "modules\nsudo.exe" -U:T -P:E "%~dpnx0" && exit
+        if exist "PostTweaks.bat" call "modules\nsudo.exe" -U:T -P:E -UseCurrentConsole "%~dpnx0" && exit
     )
     cls
 )
