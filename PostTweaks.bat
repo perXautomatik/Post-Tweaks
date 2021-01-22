@@ -1086,6 +1086,7 @@ for /f %%i in ('reg query "HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E972-E32
     reg add "%%i" /v "AdaptiveIFS" /t REG_SZ /d "0" /f >nul 2>&1
     reg add "%%i" /v "AdvancedEEE" /t REG_SZ /d "0" /f >nul 2>&1
     reg add "%%i" /v "AutoDisableGigabit" /t REG_SZ /d "0" /f >nul 2>&1
+    reg add "%%i" /v "AutoPowerSaveModeEnabled" /t REG_SZ /d "0" /f >nul 2>&1
     reg add "%%i" /v "EEELinkAdvertisement" /t REG_SZ /d "0" /f >nul 2>&1
     reg add "%%i" /v "EnableGreenEthernet" /t REG_SZ /d "0" /f >nul 2>&1
     reg add "%%i" /v "EnablePME" /t REG_SZ /d "0" /f >nul 2>&1
