@@ -1260,12 +1260,6 @@ reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "LocalSett
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SpynetReporting" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" /v "SubmitSamplesConsent" /t REG_DWORD /d "2" /f >nul 2>&1
 
-echo Disabling NET Core telemetry
-setx DOTNET_CLI_TELEMETRY_OPTOUT 1 >nul 2>&1
-
-echo Disabling PowerShell telemetry
-setx POWERSHELL_TELEMETRY_OPTOUT 1 >nul 2>&1
-
 echo Scheduled tasks
 schtasks /change /tn "Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser" /disable >nul 2>&1
 schtasks /change /tn "Microsoft\Windows\Application Experience\ProgramDataUpdater" /disable >nul 2>&1
