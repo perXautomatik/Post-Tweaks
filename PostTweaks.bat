@@ -5,8 +5,8 @@ chcp 65001 >nul 2>&1
 cd /d "%~dp0"
 title Post Tweaks
 
-set VERSION=1.6.0
-set VERSION_INFO=08/03/2021
+set VERSION=1.6.8
+set VERSION_INFO=13/03/2021
 
 call:SETVARIABLES >nul 2>&1
 
@@ -417,41 +417,6 @@ for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "Thread
 
 echo Setting all IoLatencyCaps to 0
 for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "IoLatencyCap"^| findstr "HKEY"') do reg add "%%i" /v "IoLatencyCap" /t REG_DWORD /d "0" /f >nul 2>&1
-
-echo Disabling power management for storage
-for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "EnableHIPM"^| findstr "HKEY"') do reg add "%%i" /v "EnableHIPM" /t REG_DWORD /d "0" /f >nul 2>&1
-for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Services" /s /f "EnableDIPM"^| findstr "HKEY"') do reg add "%%i" /v "EnableDIPM" /t REG_DWORD /d "0" /f >nul 2>&1
-for %%i in (LPM LPMDSTATE DIPM) do (
-    reg add "HKLM\SYSTEM\CurrentControlSet\services\iaStor\Parameters\Port0" /v "%%i" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "HKLM\SYSTEM\CurrentControlSet\services\iaStor\Parameters\Port1" /v "%%i" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "HKLM\SYSTEM\CurrentControlSet\services\iaStor\Parameters\Port2" /v "%%i" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "HKLM\SYSTEM\CurrentControlSet\services\iaStor\Parameters\Port3" /v "%%i" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "HKLM\SYSTEM\CurrentControlSet\services\iaStor\Parameters\Port4" /v "%%i" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "HKLM\SYSTEM\CurrentControlSet\services\iaStor\Parameters\Port5" /v "%%i" /t REG_DWORD /d "0" /f >nul 2>&1
-)
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\iaStorAC\Parameters" /v "EnableAPM" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\storahci\Parameters" /v "EnableAPM" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\amdsbs\Settings\CAM" /v "EnableHDDParking" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Services\amdsbs\Settings\CAM" /v "EnableALPEDisableHotplug" /t REG_DWORD /d "1" /f >nul 2>&1
-
-echo USB Hubs against power saving
-for /f "tokens=*" %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "EnhancedPowerManagementEnabled"^| findstr "HKEY"') do (
-    reg add "%%i" /v "EnhancedPowerManagementEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "AllowIdleIrpInD3" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "EnableSelectiveSuspend" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "DeviceSelectiveSuspended" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "SelectiveSuspendEnabled" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "SelectiveSuspendOn" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "fid_D1Latency" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "fid_D2Latency" /t REG_DWORD /d "0" /f >nul 2>&1
-    reg add "%%i" /v "fid_D3Latency" /t REG_DWORD /d "0" /f >nul 2>&1
-)
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\usbflags" /v "fid_D1Latency" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\usbflags" /v "fid_D2Latency" /t REG_DWORD /d "0" /f >nul 2>&1
-reg add "HKLM\SYSTEM\CurrentControlSet\Control\usbflags" /v "fid_D3Latency" /t REG_DWORD /d "0" /f >nul 2>&1
-
-echo StorPort against power saving
-for /f "tokens=*" %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Enum" /s /f "StorPort"^| findstr "StorPort"') do reg add "%%i" /v "EnableIdlePowerManagement" /t REG_DWORD /d "0" /f >nul 2>&1
 
 echo Removing IRQ Priorities
 for /f %%i in ('reg query "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /f "irq"^| findstr "irq"') do reg delete "HKLM\SYSTEM\CurrentControlSet\Control\PriorityControl" /v "%%i" /f >nul 2>&1
@@ -956,13 +921,11 @@ if not exist "%WinDir%\SetTimerResolutionService.exe" copy "resources\SetTimerRe
 call "%WinDir%\SetTimerResolutionService.exe" -Install >nul 2>&1
 
 call:MSGBOX "Set static IP Address on Network Adapter ?" vbYesNo+vbQuestion "Static IP"
-if !ERRORLEVEL! equ 6 (
-    if "!DHCP!"=="Yes" (
-        echo Setting static ip on your network adapter
-        netsh int ipv4 set address name="!INTERFACE!" static !IP! !MASK! !GATEWAY! >nul 2>&1
-        netsh int ipv4 set dns name="!INTERFACE!" static !DNS1! primary validate=no >nul 2>&1
-        netsh int ipv4 add dns name="!INTERFACE!" !DNS2! index=2 validate=no >nul 2>&1
-    )
+if !ERRORLEVEL! equ 6 if "!DHCP!"=="Yes" (
+    echo Setting static ip on your network adapter
+    netsh int ipv4 set address name="!INTERFACE!" static !IP! !MASK! !GATEWAY! >nul 2>&1
+    netsh int ipv4 set dns name="!INTERFACE!" static !DNS1! primary validate=no >nul 2>&1
+    netsh int ipv4 add dns name="!INTERFACE!" !DNS2! index=2 validate=no >nul 2>&1
 )
 
 echo Network tweaks
@@ -971,10 +934,24 @@ netsh int teredo set state disabled >nul 2>&1
 netsh int 6to4 set state disabled >nul 2>&1
 netsh int isatap set state disable >nul 2>&1
 if "!NETWORK!"=="WIFI" (netsh int tcp set supplemental internet congestionprovider=newreno >nul 2>&1) else netsh int tcp set supplemental internet congestionprovider=CUBIC >nul 2>&1
-netsh int tcp set global autotuninglevel=normal ecncapability=disabled dca=enabled netdma=enabled nonsackrttresiliency=disabled rsc=disabled rss=enabled timestamps=disabled hystart=disabled fastopenfallback=disable initialRto=2000 maxsynretransmissions=2 neighborcachelimit=4096 >nul 2>&1
-netsh int tcp set security mpp=disabled profiles=disabled >nul 2>&1
+netsh int tcp set global autotuninglevel=normal 
+netsh int tcp set global ecncapability=disabled >nul 2>&1
+netsh int tcp set global dca=enabled >nul 2>&1
+netsh int tcp set global netdma=enabled >nul 2>&1
+netsh int tcp set global nonsackrttresiliency=disabled >nul 2>&1
+netsh int tcp set global rsc=disabled >nul 2>&1
+netsh int tcp set global rss=enabled >nul 2>&1
+netsh int tcp set global timestamps=disabled >nul 2>&1
+netsh int tcp set global hystart=disabled >nul 2>&1
+netsh int tcp set global fastopenfallback=disable >nul 2>&1
+netsh int tcp set global initialRto=2000 >nul 2>&1
+netsh int tcp set global maxsynretransmissions=2 >nul 2>&1
+netsh int tcp set global neighborcachelimit=4096 >nul 2>&1
+netsh int tcp set security mpp=disabled
+netsh int tcp set security profiles=disabled >nul 2>&1
 netsh int tcp set heuristics disabled >nul 2>&1
-call:POWERSHELL "Set-NetTCPSetting -SettingName InternetCustom -MinRto 300 -InitialCongestionWindow 10"
+call:POWERSHELL "Set-NetTCPSetting -SettingName InternetCustom -MinRto 300"
+call:POWERSHELL "Set-NetTCPSetting -SettingName InternetCustom -InitialCongestionWindow 10"
 call:POWERSHELL "Set-NetOffloadGlobalSetting -Chimney Disabled"
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DefaultTTL" /t REG_DWORD /d "64" /f >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DisableTaskOffload" /t REG_DWORD /d "0" /f >nul 2>&1
@@ -1253,14 +1230,19 @@ echo Making desktop faster
 reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "ForegroundLockTimeout" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "MenuShowDelay" /t REG_SZ /d "0" /f >nul 2>&1
 reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "MouseWheelRouting" /t REG_DWORD /d "0" /f >nul 2>&1
+reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "AutoEndTasks" /t REG_SZ /d "1" /f >nul 2>&1
 reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "HungAppTimeout" /t REG_SZ /d "1000" /f >nul 2>&1
+reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "WaitToKillServiceTimeout" /t REG_SZ /d "1000" /f >nul 2>&1
 reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "WaitToKillAppTimeout" /t REG_SZ /d "1000" /f >nul 2>&1
 reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "LowLevelHooksTimeout" /t REG_SZ /d "1000" /f >nul 2>&1
 reg add "HKU\!USER_SID!\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "LinkResolveIgnoreLinkInfo" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKU\!USER_SID!\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoResolveSearch" /t REG_DWORD /d "1" /f >nul 2>&1
 reg add "HKU\!USER_SID!\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v "NoResolveTrack" /t REG_DWORD /d "1" /f >nul 2>&1
 
-echo Disabling ballon tips
+echo Improving the quality of the imported desktop Wallpaper
+reg add "HKCU\Control Panel\Desktop" /v "JPEGImportQuality" /t REG_DWORD /d "100" /f >nul 2>&1
+
+echo Disabling balloon tips
 reg add "HKU\!USER_SID!\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "EnableBalloonTips" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKU\!USER_SID!\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" /v "StartButtonBalloonTip" /t REG_DWORD /d "0" /f >nul 2>&1
 
@@ -1404,7 +1386,7 @@ if !ERRORLEVEL! equ 0 (
     echo Setting Desktop Background to Solid Color
     reg add "HKU\!USER_SID!\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Wallpapers" /v "BackgroundType" /t REG_DWORD /d "1" /f >nul 2>&1
     reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "Wallpaper" /t REG_SZ /d "" /f >nul 2>&1
-    reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "LastUpdated" /t REG_DWORD /d "0xffffffff" /f >nul 2>&1
+    reg add "HKU\!USER_SID!\Control Panel\Desktop" /v "LastUpdated" /t REG_DWORD /d "4294967295" /f >nul 2>&1
     reg add "HKU\!USER_SID!\Control Panel\Colors" /v "Background" /t REG_SZ /d "58 110 165" /f >nul 2>&1
 )
 findstr /c:"Reduce Size of Buttons Close Minimize Maximize" "%TMP%\interface.txt" >nul 2>&1
@@ -1982,7 +1964,7 @@ if "!HWiNFO!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! HWiNFO" (
 )
 if "!CrystalDiskInfo!"=="!S_MAGENTA![!S_GREEN!x!S_MAGENTA!]!S_WHITE! CrystalDiskInfo" (
     set "OPENTOOLS=True"
-    call:CURL "0" "https://dotsrc.dl.osdn.net/osdn/crystaldiskinfo/73507/CrystalDiskInfo8_8_9.zip" "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip"
+    call:CURL "0" "https://dotsrc.dl.osdn.net/osdn/crystaldiskinfo/74602/CrystalDiskInfo8_11_2.zip" "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip"
     call "modules\7z.exe" x -aoa "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip"  -O"%UserProfile%\Documents\_Tools\CrystalDiskInfo">nul 2>&1
     del /f /q "%UserProfile%\Documents\_Tools\CrystalDiskInfo\CrystalDiskInfo.zip" >nul 2>&1
 )
