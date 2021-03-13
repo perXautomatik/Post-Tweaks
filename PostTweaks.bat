@@ -934,7 +934,7 @@ netsh int teredo set state disabled >nul 2>&1
 netsh int 6to4 set state disabled >nul 2>&1
 netsh int isatap set state disable >nul 2>&1
 if "!NETWORK!"=="WIFI" (netsh int tcp set supplemental internet congestionprovider=newreno >nul 2>&1) else netsh int tcp set supplemental internet congestionprovider=CUBIC >nul 2>&1
-netsh int tcp set global autotuninglevel=normal 
+netsh int tcp set global autotuninglevel=normal >nul 2>&1
 netsh int tcp set global ecncapability=disabled >nul 2>&1
 netsh int tcp set global dca=enabled >nul 2>&1
 netsh int tcp set global netdma=enabled >nul 2>&1
@@ -947,12 +947,12 @@ netsh int tcp set global fastopenfallback=disable >nul 2>&1
 netsh int tcp set global initialRto=2000 >nul 2>&1
 netsh int tcp set global maxsynretransmissions=2 >nul 2>&1
 netsh int tcp set global neighborcachelimit=4096 >nul 2>&1
-netsh int tcp set security mpp=disabled
+netsh int tcp set security mpp=disabled >nul 2>&1
 netsh int tcp set security profiles=disabled >nul 2>&1
 netsh int tcp set heuristics disabled >nul 2>&1
-call:POWERSHELL "Set-NetTCPSetting -SettingName InternetCustom -MinRto 300"
-call:POWERSHELL "Set-NetTCPSetting -SettingName InternetCustom -InitialCongestionWindow 10"
-call:POWERSHELL "Set-NetOffloadGlobalSetting -Chimney Disabled"
+call:POWERSHELL "Set-NetTCPSetting -SettingName InternetCustom -MinRto 300" >nul 2>&1
+call:POWERSHELL "Set-NetTCPSetting -SettingName InternetCustom -InitialCongestionWindow 10" >nul 2>&1
+call:POWERSHELL "Set-NetOffloadGlobalSetting -Chimney Disabled" >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DefaultTTL" /t REG_DWORD /d "64" /f >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "DisableTaskOffload" /t REG_DWORD /d "0" /f >nul 2>&1
 reg add "HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" /v "EnableICMPRedirect" /t REG_DWORD /d "1" /f >nul 2>&1
